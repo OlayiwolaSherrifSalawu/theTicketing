@@ -13,11 +13,10 @@ type User struct {
 }
 
 type Event struct {
-	Location  string    `json:"location"`
-	StartTime time.Time `json:"date"`
-
-	AvailableTickets int    `json:"availableTickets"`
-	TicketsTypes     string `json:"ticketsTypes"`
-	EventName        string `json:"eventName"`
-	TotalCapacity    int    `json:"totalCapacity"`
+	Location         string    `json:"location"`
+	StartTime        time.Time `json:"date"`
+	AvailableTickets int       `json:"availableTickets"`
+	TicketsTypes     string    `json:"ticketsTypes"`
+	EventName        string    `json:"eventName"`
+	TotalCapacity    int       `json:"totalCapacity"`
 }
