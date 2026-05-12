@@ -2,7 +2,11 @@ package api
 
 import (
 	"database/sql"
-	_"github.com/lib/pq"
+	"flag"
+	"log"
+	"os"
+
+	_ "github.com/lib/pq"
 )
 
 type AppInterface interface {
@@ -10,7 +14,10 @@ type AppInterface interface {
 }
 
 type Application struct {
-	DB *sql.DB
+	Port        string
+	ErroMessage *log.Logger
+	InfoLogger  *log.Logger
+	DB          *sql.DB
 }
 
 func NewApplication(db *sql.DB) *Application {
@@ -23,6 +30,10 @@ func NewAppInterface(s *Application) AppInterface {
 }
 
 func (a *Application) Run() {
+	a.InfoLogger = log.New(os.Stdout, "INFO:  \t", log.Ldate|log.Ltime)
+	a.ErroMessage = log.New(os.Stderr, "ERROR: \t", log.Ldate|log.Ltime)
+	flag.StringVar(&a.Port, "port", ":4000", "")
+	flag.Parse()
 
 }
 
