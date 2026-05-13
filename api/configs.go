@@ -31,7 +31,7 @@ func NewApplication(db *sql.DB) *Application {
 	}
 }
 func NewAppInterface(s *Application) AppInterface {
-	return &Application{}
+	return s
 }
 
 func (a *Application) Run() {
@@ -48,8 +48,9 @@ func (a *Application) Run() {
 		Handler:  newMux,
 		ErrorLog: a.ErroMessage,
 	}
-	err := serve.ListenAndServe()
 	a.InfoLogger.Printf("started server on port %s\n", a.Port)
+
+	err := serve.ListenAndServe()
 	a.ErroMessage.Println(err)
 
 }
@@ -71,12 +72,15 @@ func CreateConnection(envFile string) (*pq.Connector, error) {
 	port, _ := strconv.Atoi(os.Getenv("Port"))
 	host := os.Getenv("Host")
 	user := os.Getenv("User")
-
+	password := os.Getenv("Password")
+	database := os.Getenv("Database")
 	cfg := pq.Config{
 		Host:           host,
 		Port:           uint16(port),
 		User:           user,
 		ConnectTimeout: 5 * time.Second,
+		Password:       password,
+		Database:       database,
 	}
 	c, err := pq.NewConnectorConfig(cfg)
 	if err != nil {

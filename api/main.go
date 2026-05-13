@@ -1,5 +1,7 @@
 package api
 
+import "log"
+
 func Run() {
 	conn, errr := CreateConnection("config.env")
 	if errr != nil {
@@ -7,6 +9,7 @@ func Run() {
 	}
 	sqlVAL, errr := OpenDb(conn)
 	if errr != nil {
+		log.Fatal(errr)
 		return
 	}
 	app := NewApplication(sqlVAL)

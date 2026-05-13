@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/OlayiwolaSherrifSalawu/theTicketing.git/pkg/model"
@@ -16,4 +17,5 @@ func (a *Application) CreateUserHandler(w http.ResponseWriter, r *http.Request) 
 		a.clientError(w, http.StatusBadRequest)
 		return
 	}
+	fmt.Fprint(w, "successfully register users\n")
 }
