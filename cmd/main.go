@@ -9,6 +9,7 @@ import (
 func main() {
 	var db *sql.DB
 	app := api.NewApplication(db)
-	apps := api.NewAppInterface(app)
+	api.
+		apps := api.NewAppInterface(app)
 	apps.Run()
 }
