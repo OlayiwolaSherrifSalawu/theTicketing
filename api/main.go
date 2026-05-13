@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"flag"
 	"log"
+	"net/http"
 	"os"
 
 	_ "github.com/lib/pq"
@@ -29,15 +30,27 @@ func NewAppInterface(s *Application) AppInterface {
 	return &Application{}
 }
 
+func CreateDataBase(){
+	
+}
 func (a *Application) Run() {
 	a.InfoLogger = log.New(os.Stdout, "INFO:  \t", log.Ldate|log.Ltime)
 	a.ErroMessage = log.New(os.Stderr, "ERROR: \t", log.Ldate|log.Ltime)
-	flag.StringVar(&a.Port, "port", ":4000", "")
+	flag.StringVar(&a.Port, "port", ":4000", "Port Address")
 	flag.Parse()
-
+	// creating a server
+	newMux := a.routers()
+	serve := http.Server{
+		Addr:     a.Port,
+		Handler:  newMux,
+		ErrorLog: a.ErroMessage,
+	}
+	err := serve.ListenAndServe()
+	a.InfoLogger.Printf("started server on port %s\n", a.Port)
+	a.ErroMessage.Println(err)
 }
 
-func openDb(dsn string) (*sql.DB, error) {
+func OpenDb(dsn string) (*sql.DB, error) {
 	db, err := sql.Open("postgres", dsn)
 	if err != nil {
 		return nil, OPENING_POOL_FAILED
