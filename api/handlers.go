@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/OlayiwolaSherrifSalawu/theTicketing.git/pkg/model"
-	"golang.org/x/crypto/bcrypt"
+	"github.com/google/uuid"
 )
 
 type dto struct {
@@ -30,22 +30,19 @@ func (a *Application) CreateUserHandler(w http.ResponseWriter, r *http.Request) 
 		a.clientError(w, http.StatusBadRequest)
 		return
 	}
+	Id := uuid.New().String()
 	Users := &model.User{
-		ID:           inputDto.ID,
+		ID:           Id,
 		UserName:     inputDto.UserName,
 		EmailAddress: inputDto.EmailAddress,
 		TimeStamp:    time.Now(),
 		HashPassword: HashPassword,
 	}
 	inputDto = dto{}
-	fmt.Fprint(w, "successfully register users\n")
-}
-
-func hashPassword(s string) (string, error) {
-	hashByte, err := bcrypt.GenerateFromPassword([]byte(s), 10)
+	err = a.TheTicket.Insert(Users)
 	if err != nil {
-		return "", err
+		a.serverError(w, err)
+		return
 	}
-	hashedPassword := string(hashByte)
-	return hashedPassword, nil
+	fmt.Fprint(w, "successfully register users\n")
 }

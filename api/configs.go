@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/OlayiwolaSherrifSalawu/theTicketing.git/pkg/model/theticket"
 	"github.com/joho/godotenv"
 	"github.com/lib/pq"
 	_ "github.com/lib/pq"
@@ -23,6 +24,7 @@ type Application struct {
 	ErroMessage *log.Logger
 	InfoLogger  *log.Logger
 	DB          *sql.DB
+	TheTicket   *theticket.TheTicketModel
 }
 
 func NewApplication(db *sql.DB) *Application {
