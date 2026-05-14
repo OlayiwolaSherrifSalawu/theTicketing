@@ -18,11 +18,12 @@ func (a *Application) CreateUserHandler(w http.ResponseWriter, r *http.Request) 
 		a.clientError(w, http.StatusBadRequest)
 		return
 	}
-	Users.HashPassword, err = hashPassword(Users.HashPassword)
+	Users.HashPassword, err = hashPassword(Users.Password)
 	if err != nil {
 		a.clientError(w, http.StatusBadRequest)
 		return
 	}
+	Users.Password = ""
 	fmt.Fprint(w, "successfully register users\n")
 }
 
