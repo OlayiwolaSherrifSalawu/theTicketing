@@ -9,7 +9,6 @@ type User struct {
 	UserName     string    `json:"userName"`
 	EmailAddress string    `json:"emailAddress"`
 	TimeStamp    time.Time `json:"timeStamp"`
-	Password     string    `json:"password"`
 	HashPassword string    `json:"-"`
 }
 
