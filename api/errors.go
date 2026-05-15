@@ -19,7 +19,6 @@ const (
 
 func (a *Application) clientError(w http.ResponseWriter, status int) {
 	http.Error(w, http.StatusText(status), status)
-
 }
 
 func (a *Application) serverError(w http.ResponseWriter, err error) {

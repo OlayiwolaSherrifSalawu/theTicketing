@@ -1,12 +1,16 @@
 package api
 
 import (
+	"context"
 	"database/sql"
+	"errors"
 	"flag"
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
 	"strconv"
+	"syscall"
 	"time"
 
 	"github.com/OlayiwolaSherrifSalawu/theTicketing.git/pkg/model/theticket"
@@ -38,7 +42,8 @@ func NewAppInterface(s *Application) AppInterface {
 }
 
 func (a *Application) Run() {
-
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
 	a.InfoLogger = log.New(os.Stdout, "INFO:  \t", log.Ldate|log.Ltime)
 	a.ErroMessage = log.New(os.Stderr, "ERROR: \t", log.Ldate|log.Ltime)
 	flag.StringVar(&a.Port, "port", ":4000", "Port Address")
@@ -51,11 +56,24 @@ func (a *Application) Run() {
 		Handler:  newMux,
 		ErrorLog: a.ErroMessage,
 	}
-	a.InfoLogger.Printf("started server on port %s\n", a.Port)
-
-	err := serve.ListenAndServe()
-	a.ErroMessage.Println(err)
-
+	go func() {
+		a.InfoLogger.Printf("started server on port %s\n", a.Port)
+		err := serve.ListenAndServe()
+		if err != nil && !errors.Is(err, http.ErrServerClosed) {
+			a.ErroMessage.Println(err)
+			return
+		}
+	}()
+	<-quit
+	a.InfoLogger.Println("Shutting down server..")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	err := serve.Shutdown(ctx)
+	if err != nil {
+		a.ErroMessage.Fatal(err)
+		return
+	}
+	a.InfoLogger.Println("Server shutdown properly")
 }
 
 func CreateConnection(envFile string) (*pq.Connector, error) {

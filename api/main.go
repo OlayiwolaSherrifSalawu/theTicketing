@@ -1,6 +1,8 @@
 package api
 
-import "log"
+import (
+	"log"
+)
 
 func Run() {
 	conn, errr := CreateConnection("config.env")
@@ -15,5 +17,6 @@ func Run() {
 	app := NewApplication(sqlVAL)
 	app.RunDBMigration(sqlVAL)
 	apps := NewAppInterface(app)
+
 	apps.Run()
 }
