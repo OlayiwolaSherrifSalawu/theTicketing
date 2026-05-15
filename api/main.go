@@ -13,7 +13,7 @@ func Run() {
 		return
 	}
 	app := NewApplication(sqlVAL)
-
+	app.RunDBMigration(sqlVAL)
 	apps := NewAppInterface(app)
 	apps.Run()
 }

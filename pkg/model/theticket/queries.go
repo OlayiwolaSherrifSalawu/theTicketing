@@ -11,7 +11,7 @@ type TheTicketModel struct {
 }
 
 func (d *TheTicketModel) Insert(User *model.User) error {
-	stmt := "INSERT INTO users(id, username, email_address, time_stamp, password) VALUES ($1, $2, $3, $4, $5)"
+	stmt := "INSERT INTO users(id, username, email_address, created_at, password) VALUES ($1, $2, $3, $4, $5)"
 	_, err := d.DB.Exec(stmt, User.ID, User.UserName, User.EmailAddress, User.TimeStamp, User.HashPassword)
 	if err != nil {
 		return err

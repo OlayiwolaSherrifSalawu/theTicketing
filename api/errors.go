@@ -14,6 +14,7 @@ func (e ConstantError) Error() string {
 
 const (
 	OPENING_POOL_FAILED = ConstantError("Failure in creating database pool")
+	MIGRATION_FAILED    = ConstantError("Failed migrations")
 )
 
 func (a *Application) clientError(w http.ResponseWriter, status int) {

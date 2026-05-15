@@ -57,13 +57,6 @@ func (a *Application) Run() {
 
 }
 
-func OpenDb(dsn *pq.Connector) (*sql.DB, error) {
-	db := sql.OpenDB(dsn)
-	if err := db.Ping(); err != nil {
-		return nil, OPENING_POOL_FAILED
-	}
-	return db, nil
-}
 
 func CreateConnection(envFile string) (*pq.Connector, error) {
 	errs := godotenv.Load(envFile)
