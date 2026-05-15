@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -42,9 +43,11 @@ func (a *Application) CreateUserHandler(w http.ResponseWriter, r *http.Request) 
 		HashPassword: HashPassword,
 	}
 	inputDto = dto{}
-	err = a.TheTicket.Insert(Users)
+	ctx, cancel := context.WithTimeout(r.Context(), 3*time.Second)
+	defer cancel()
+	err = a.TheTicket.Insert(ctx, Users)
 	if err != nil {
-		a.clientError(w, 505)
+		a.serverError(w, err)
 		return
 	}
 	fmt.Fprint(w, "successfully register users\n")
