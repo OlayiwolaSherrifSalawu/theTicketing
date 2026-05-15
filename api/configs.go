@@ -29,7 +29,8 @@ type Application struct {
 
 func NewApplication(db *sql.DB) *Application {
 	return &Application{
-		DB: db,
+		DB:        db,
+		TheTicket: &theticket.TheTicketModel{DB: db},
 	}
 }
 func NewAppInterface(s *Application) AppInterface {
@@ -56,7 +57,6 @@ func (a *Application) Run() {
 	a.ErroMessage.Println(err)
 
 }
-
 
 func CreateConnection(envFile string) (*pq.Connector, error) {
 	errs := godotenv.Load(envFile)
