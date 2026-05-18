@@ -78,5 +78,5 @@ func (a *Application) LoginUser(w http.ResponseWriter, r *http.Request) {
 
 	}
 	dtoInput = dto{}
-	fmt.Fprintf(w, "welcome you are logged in ")
+	fmt.Fprintf(w, "welcome you are logged in \n")
 }

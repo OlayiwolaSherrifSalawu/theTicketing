@@ -3,7 +3,10 @@ package api
 import (
 	"database/sql"
 	"errors"
+	"os"
+	"time"
 
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
@@ -46,4 +49,18 @@ func hashPassword(s string) (string, error) {
 	}
 	hashedPassword := string(hashByte)
 	return hashedPassword, nil
+}
+
+func GenerateToken(id string) string {
+	jwT := os.Getenv("JWT")
+	claims := jwt.MapClaims{
+		"userID": id,
+		"exp":    time.Now().Add(time.Hour * 12).Unix(),
+	}
+	tokens := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	signed, err := tokens.SignedString([]byte(jwT))
+	if err != nil {
+		return ""
+	}
+	return signed
 }
