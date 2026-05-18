@@ -78,5 +78,18 @@ func (a *Application) LoginUser(w http.ResponseWriter, r *http.Request) {
 
 	}
 	dtoInput = dto{}
-	fmt.Fprintf(w, "welcome you are logged in \n")
+	tokenss, err := GenerateToken(fetechedUser.ID)
+	if err != nil {
+		a.serverError(w, err)
+		return
+	}
+	response := map[string]string{
+		"token": tokenss,
+	}
+	w.Header().Set("Content-Type", "application/json")
+	err = json.NewEncoder(w).Encode(response)
+	if err != nil {
+		a.serverError(w, err)
+		return
+	}
 }

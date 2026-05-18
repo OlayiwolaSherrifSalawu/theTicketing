@@ -51,7 +51,7 @@ func hashPassword(s string) (string, error) {
 	return hashedPassword, nil
 }
 
-func GenerateToken(id string) string {
+func GenerateToken(id string) (string, error) {
 	jwT := os.Getenv("JWT")
 	claims := jwt.MapClaims{
 		"userID": id,
@@ -60,7 +60,7 @@ func GenerateToken(id string) string {
 	tokens := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	signed, err := tokens.SignedString([]byte(jwT))
 	if err != nil {
-		return ""
+		return "", err
 	}
-	return signed
+	return signed, err
 }
