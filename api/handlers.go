@@ -9,6 +9,7 @@ import (
 
 	"github.com/OlayiwolaSherrifSalawu/theTicketing.git/pkg/model"
 	"github.com/google/uuid"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type dto struct {
@@ -52,4 +53,30 @@ func (a *Application) CreateUserHandler(w http.ResponseWriter, r *http.Request) 
 	}
 	fmt.Fprint(w, "successfully register users\n")
 
+}
+
+func (a *Application) LoginUser(w http.ResponseWriter, r *http.Request) {
+	dtoInput := dto{}
+	fetechedUser := &model.User{}
+	r.Body = http.MaxBytesReader(w, r.Body, 1234)
+	err := json.NewDecoder(r.Body).Decode(&dtoInput)
+	if err != nil {
+		a.clientError(w, http.StatusBadRequest)
+		return
+	}
+	ctx, cancel := context.WithTimeout(r.Context(), 3*time.Second)
+	defer cancel()
+	err = a.TheTicket.GetByEmail(ctx, dtoInput.EmailAddress, fetechedUser)
+	if err != nil {
+		a.clientError(w, http.StatusUnauthorized)
+		return
+	}
+	err = bcrypt.CompareHashAndPassword([]byte(fetechedUser.HashPassword), []byte(dtoInput.Password))
+	if err != nil {
+		a.clientError(w, http.StatusUnauthorized)
+		return
+
+	}
+	dtoInput = dto{}
+	fmt.Fprintf(w, "welcome you are logged in ")
 }
