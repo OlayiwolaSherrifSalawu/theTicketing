@@ -41,6 +41,6 @@ func (a *Application) RequireAuthentication(next http.Handler) http.Handler {
 				a.clientError(w, http.StatusUnauthorized)
 				return
 			}
-			theAuth := strings.Trim()
+			theAuth := strings.TrimPrefix(auth, "Bearer ")
 		})
 }
