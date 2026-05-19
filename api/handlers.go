@@ -93,3 +93,7 @@ func (a *Application) LoginUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+
+func (a *Application) DownLoadHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "the jwt token is valid")
+}
