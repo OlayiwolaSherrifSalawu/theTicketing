@@ -10,6 +10,7 @@ import (
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
+	"github.com/joho/godotenv"
 	"github.com/lib/pq"
 	_ "github.com/lib/pq"
 	"golang.org/x/crypto/bcrypt"
@@ -52,6 +53,11 @@ func hashPassword(s string) (string, error) {
 }
 
 func GenerateToken(id string) (string, error) {
+	errs := godotenv.Load("config.env")
+	if errs != nil {
+		return "", errs
+	}
+
 	jwT := os.Getenv("JWT")
 	claims := jwt.MapClaims{
 		"userID": id,

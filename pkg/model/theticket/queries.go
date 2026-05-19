@@ -18,9 +18,7 @@ func (d *TheTicketModel) Insert(ctx context.Context, User *model.User) error {
 	if err != nil {
 		return err
 	}
-
 	defer tx.Rollback()
-
 	_, err = tx.ExecContext(ctx, stmt, User.ID, User.UserName, User.EmailAddress, User.TimeStamp, User.HashPassword)
 	if err != nil {
 		return err
