@@ -39,7 +39,7 @@ func (a *Application) RecoverPanic(next http.Handler) http.Handler {
 func (a *Application) RequireAuthentication(next http.Handler) http.Handler {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			auth := r.Header.Get("Authorization")
+			auth := a.getToken(r)
 			if auth == "" {
 				a.clientError(w, http.StatusUnauthorized)
 				return

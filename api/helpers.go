@@ -3,14 +3,15 @@ package api
 import (
 	"database/sql"
 	"errors"
+	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
-	"github.com/joho/godotenv"
 	"github.com/lib/pq"
 	_ "github.com/lib/pq"
 	"golang.org/x/crypto/bcrypt"
@@ -53,11 +54,6 @@ func hashPassword(s string) (string, error) {
 }
 
 func GenerateToken(id string) (string, error) {
-	errs := godotenv.Load("config.env")
-	if errs != nil {
-		return "", errs
-	}
-
 	jwT := os.Getenv("JWT")
 	claims := jwt.MapClaims{
 		"userID": id,
@@ -68,5 +64,18 @@ func GenerateToken(id string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
 	return signed, err
+}
+func (a *Application) getToken(r *http.Request) string {
+	auth := r.Header.Get("Authorization")
+	if auth != "" {
+		return strings.TrimPrefix(auth, "Bearer ")
+	} else {
+		cookie, err := r.Cookie("access")
+		if err == nil {
+			return cookie.Value
+		}
+	}
+	return ""
 }

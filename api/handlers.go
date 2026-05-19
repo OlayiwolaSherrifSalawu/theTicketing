@@ -60,6 +60,7 @@ func (a *Application) LoginUser(w http.ResponseWriter, r *http.Request) {
 	fetechedUser := &model.User{}
 	r.Body = http.MaxBytesReader(w, r.Body, 1234)
 	err := json.NewDecoder(r.Body).Decode(&dtoInput)
+
 	if err != nil {
 		a.clientError(w, http.StatusBadRequest)
 		return
@@ -83,6 +84,7 @@ func (a *Application) LoginUser(w http.ResponseWriter, r *http.Request) {
 		a.serverError(w, err)
 		return
 	}
+
 	response := map[string]string{
 		"token": tokenss,
 	}
@@ -92,6 +94,16 @@ func (a *Application) LoginUser(w http.ResponseWriter, r *http.Request) {
 		a.serverError(w, err)
 		return
 	}
+	http.SetCookie(w, &http.Cookie{
+		Name:     "access",
+		Value:    tokenss,
+		Path:     "/",
+		Secure:   true,
+		HttpOnly: true,
+		SameSite: http.SameSiteLaxMode,
+	})
+
+	http.Redirect(w, r, "/dashboard", http.StatusSeeOther)
 }
 
 func (a *Application) DownLoadHandler(w http.ResponseWriter, r *http.Request) {
