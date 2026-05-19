@@ -2,7 +2,10 @@ package api
 
 import (
 	"net/http"
+	"os"
 	"strings"
+
+	"github.com/golang-jwt/jwt/v5"
 )
 
 func (a *Application) LogMessage(next http.Handler) http.Handler {
@@ -42,5 +45,16 @@ func (a *Application) RequireAuthentication(next http.Handler) http.Handler {
 				return
 			}
 			theAuth := strings.TrimPrefix(auth, "Bearer ")
+			tokens, err := jwt.Parse(theAuth, func(t *jwt.Token) (any, error) {
+				if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
+					return nil, UNEXPECTED_SIGNING_METHOD
+				}
+				return []byte(os.Getenv("JWT")), nil
+			})
+			if err != nil || !tokens.Valid {
+				a.clientError(w, http.StatusUnauthorized)
+				return
+			}
+			next.ServeHTTP(w, r)
 		})
 }

@@ -13,8 +13,9 @@ func (e ConstantError) Error() string {
 }
 
 const (
-	OPENING_POOL_FAILED = ConstantError("Failure in creating database pool")
-	MIGRATION_FAILED    = ConstantError("Failed migrations")
+	OPENING_POOL_FAILED       = ConstantError("Failure in creating database pool")
+	MIGRATION_FAILED          = ConstantError("Failed migrations")
+	UNEXPECTED_SIGNING_METHOD = ConstantError("Unexpected Signing Method")
 )
 
 func (a *Application) clientError(w http.ResponseWriter, status int) {
