@@ -81,7 +81,6 @@ func CreateConnection(envFile string) (*pq.Connector, error) {
 	if errs != nil {
 		return nil, errs
 	}
-
 	port, _ := strconv.Atoi(os.Getenv("Port"))
 	host := os.Getenv("Host")
 	user := os.Getenv("User")
