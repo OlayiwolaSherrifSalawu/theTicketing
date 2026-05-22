@@ -107,5 +107,10 @@ func (a *Application) LoginUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *Application) DownLoadHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "the jwt token is valid")
+	if userId, ok := extractUserFromContext(r.Context()); ok {
+		fmt.Fprintf(w, "welcome user %s", userId)
+		return
+	}
+	fmt.Fprint(w, "error getting your token")
+	a.clientError(w, http.StatusUnauthorized)
 }
