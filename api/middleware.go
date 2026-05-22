@@ -58,7 +58,7 @@ func (a *Application) RequireAuthentication(next http.Handler) http.Handler {
 				a.clientError(w, http.StatusUnauthorized)
 				return
 			}
-			userid, err := extractUserId(tokens)
+			userid, err := extractUserFromtoken(tokens)
 			if err != nil {
 				a.serverError(w, err)
 			}

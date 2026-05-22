@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 	"net/http"
@@ -83,11 +84,18 @@ func (a *Application) getToken(r *http.Request) string {
 	return ""
 }
 
-func extractUserId(Token *jwt.Token) (string, error) {
+func extractUserFromtoken(Token *jwt.Token) (string, error) {
 	userId := ""
 	if claims, ok := Token.Claims.(jwt.MapClaims); ok && Token.Valid {
 		userId = claims["userId"].(string)
 		return userId, nil
 	}
 	return "", FAILED_TO_GETID
+}
+
+func extractUserFromContext(ctx context.Context) (string, bool) {
+	if val, ok := ctx.Value("userID").(string); ok {
+		return val, true
+	}
+	return "", false
 }
