@@ -64,7 +64,8 @@ func (a *Application) RequireAuthentication(next http.Handler) http.Handler {
 			}
 			ctx := getContext(r.Context(), userid)
 			if ctx == nil {
-
+				a.serverError(w, CANT_SEND_NIL_CTX)
+				return
 			}
 			newReq := r.WithContext(ctx)
 			next.ServeHTTP(w, newReq)
