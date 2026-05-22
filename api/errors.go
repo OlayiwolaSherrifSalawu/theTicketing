@@ -16,6 +16,7 @@ const (
 	OPENING_POOL_FAILED       = ConstantError("Failure in creating database pool")
 	MIGRATION_FAILED          = ConstantError("Failed migrations")
 	UNEXPECTED_SIGNING_METHOD = ConstantError("Unexpected Signing Method")
+	FAILED_TO_GETID           = ConstantError("Failed to get id from claims")
 )
 
 func (a *Application) clientError(w http.ResponseWriter, status int) {

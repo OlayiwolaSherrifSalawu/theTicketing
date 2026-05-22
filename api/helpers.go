@@ -77,5 +77,15 @@ func (a *Application) getToken(r *http.Request) string {
 			return cookie.Value
 		}
 	}
+
 	return ""
+}
+
+func extractUserId(Token *jwt.Token) (string, error) {
+	userId := ""
+	if claims, ok := Token.Claims.(jwt.MapClaims); ok && Token.Valid {
+		userId = claims["userId"].(string)
+		return userId, nil
+	}
+	return "", FAILED_TO_GETID
 }

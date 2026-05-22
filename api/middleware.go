@@ -55,6 +55,7 @@ func (a *Application) RequireAuthentication(next http.Handler) http.Handler {
 				a.clientError(w, http.StatusUnauthorized)
 				return
 			}
+			
 			next.ServeHTTP(w, r)
 		})
 }
