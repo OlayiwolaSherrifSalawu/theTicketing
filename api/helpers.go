@@ -72,6 +72,7 @@ func GenerateToken(id string) (string, error) {
 }
 func (a *Application) getToken(r *http.Request) string {
 	auth := r.Header.Get("Authorization")
+
 	if auth != "" {
 		return strings.TrimPrefix(auth, "Bearer ")
 	} else {

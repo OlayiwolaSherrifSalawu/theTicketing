@@ -103,7 +103,7 @@ func (a *Application) LoginUser(w http.ResponseWriter, r *http.Request) {
 		SameSite: http.SameSiteLaxMode,
 	})
 
-	http.Redirect(w, r, "/dashboard", http.StatusSeeOther)
+	// http.Redirect(w, r, "/dashboard", http.StatusSeeOther)
 }
 
 func (a *Application) DownLoadHandler(w http.ResponseWriter, r *http.Request) {

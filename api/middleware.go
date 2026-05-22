@@ -44,6 +44,7 @@ func (a *Application) RequireAuthentication(next http.Handler) http.Handler {
 		func(w http.ResponseWriter, r *http.Request) {
 			auth := a.getToken(r)
 			if auth == "" {
+				a.ErroMessage.Println("afang") //my get token is empty
 				a.clientError(w, http.StatusUnauthorized)
 				return
 			}
