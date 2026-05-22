@@ -17,6 +17,8 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+type contexK string
+
 func OpenDb(dsn *pq.Connector) (*sql.DB, error) {
 	db := sql.OpenDB(dsn)
 	if err := db.Ping(); err != nil {

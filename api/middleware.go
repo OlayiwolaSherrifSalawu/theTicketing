@@ -1,12 +1,15 @@
 package api
 
 import (
+	"context"
 	"net/http"
 	"os"
 	"strings"
 
 	"github.com/golang-jwt/jwt/v5"
 )
+
+var ct contexK
 
 func (a *Application) LogMessage(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -55,7 +58,12 @@ func (a *Application) RequireAuthentication(next http.Handler) http.Handler {
 				a.clientError(w, http.StatusUnauthorized)
 				return
 			}
-			
+
 			next.ServeHTTP(w, r)
 		})
+}
+
+func getContext(ctx context.Context, userid string) context.Context {
+	newCtx := context.WithValue(ctx, ct, userid)
+	return newCtx
 }
