@@ -55,7 +55,6 @@ func (a *Application) RequireAuthentication(next http.Handler) http.Handler {
 				a.clientError(w, http.StatusUnauthorized)
 				return
 			}
-			claims := tokens.Claims.(jwt.MapClaims)
 			next.ServeHTTP(w, r)
 		})
 }
