@@ -87,14 +87,14 @@ func (a *Application) getToken(r *http.Request) string {
 func extractUserFromtoken(Token *jwt.Token) (string, error) {
 	userId := ""
 	if claims, ok := Token.Claims.(jwt.MapClaims); ok && Token.Valid {
-		userId = claims["userId"].(string)
+		userId = claims["userID"].(string)
 		return userId, nil
 	}
 	return "", FAILED_TO_GETID
 }
 
 func extractUserFromContext(ctx context.Context) (string, bool) {
-	if val, ok := ctx.Value("userID").(string); ok {
+	if val, ok := ctx.Value(ct).(string); ok {
 		return val, true
 	}
 	return "", false
