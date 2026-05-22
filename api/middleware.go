@@ -58,6 +58,11 @@ func (a *Application) RequireAuthentication(next http.Handler) http.Handler {
 				a.clientError(w, http.StatusUnauthorized)
 				return
 			}
+			userid, err := extractUserId(tokens)
+			if err != nil {
+				a.serverError(w, err)
+			}
+			ctx := getContext(context.Background(), userid)
 
 			next.ServeHTTP(w, r)
 		})
