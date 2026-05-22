@@ -62,9 +62,9 @@ func (a *Application) RequireAuthentication(next http.Handler) http.Handler {
 			if err != nil {
 				a.serverError(w, err)
 			}
-			ctx := getContext(context.Background(), userid)
-
-			next.ServeHTTP(w, r)
+			ctx := getContext(r.Context(), userid)
+			newReq := r.WithContext(ctx)
+			next.ServeHTTP(w, newReq)
 		})
 }
 
