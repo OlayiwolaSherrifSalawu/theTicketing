@@ -17,6 +17,7 @@ const (
 	MIGRATION_FAILED          = ConstantError("Failed migrations")
 	UNEXPECTED_SIGNING_METHOD = ConstantError("Unexpected Signing Method")
 	FAILED_TO_GETID           = ConstantError("Failed to get id from claims")
+	CANT_SEND_NIL_CTX         = ConstantError("Cant serve nil context would cause panic")
 )
 
 func (a *Application) clientError(w http.ResponseWriter, status int) {
