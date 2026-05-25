@@ -13,6 +13,7 @@ type User struct {
 }
 
 type Event struct {
+	Id               string    `json:"id"`
 	Location         string    `json:"location"`
 	StartTime        time.Time `json:"date"`
 	AvailableTickets int       `json:"availableTickets"`
