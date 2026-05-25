@@ -50,7 +50,7 @@ func (a *Application) Run() {
 	flag.Parse()
 
 	// creating a server
-	newMux := a.routers()
+	newMux :=a.routers() 
 	serve := http.Server{
 		Addr:     a.Port,
 		Handler:  newMux,
