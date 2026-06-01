@@ -2,6 +2,7 @@ package api
 
 import (
 	"log"
+	"os"
 )
 
 func Run() {
@@ -9,13 +10,18 @@ func Run() {
 	if errr != nil {
 		return
 	}
+	newLog := log.New(os.Stderr, "error-message", log.Ltime)
 	sqlVAL, errr := OpenDb(conn)
 	if errr != nil {
-		log.Fatal(errr)
+		newLog.Println(errr)
 		return
 	}
 	app := NewApplication(sqlVAL)
-	app.RunDBMigration(sqlVAL)
+	errors := app.RunDBMigration(sqlVAL)
+	if errors != nil {
+		newLog.Println(errors)
+		return
+	}
 	apps := NewAppInterface(app)
 
 	apps.Run()

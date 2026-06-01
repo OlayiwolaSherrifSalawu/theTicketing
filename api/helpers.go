@@ -28,24 +28,22 @@ func OpenDb(dsn *pq.Connector) (*sql.DB, error) {
 	return db, nil
 }
 
-func (a *Application) RunDBMigration(db *sql.DB) {
+func (a *Application) RunDBMigration(db *sql.DB) error {
 	dbd, err := postgres.WithInstance(db, &postgres.Config{})
 	if err != nil {
-		a.ErroMessage.Fatal(MIGRATION_FAILED, "Error:", err)
-		return
+		return err
 	}
 	migra, err := migrate.NewWithDatabaseInstance("file://database", "postgres", dbd)
 	if err != nil {
-		a.ErroMessage.Fatal(MIGRATION_FAILED, "Error:", err)
-		return
+		return err
 	}
 	err = migra.Up()
 	if err != nil {
 		if !errors.Is(err, migrate.ErrNoChange) {
-			a.ErroMessage.Fatal(MIGRATION_FAILED, "Error:", err)
-			return
+			return err
 		}
 	}
+	return nil
 }
 func hashPassword(s string) (string, error) {
 	hashByte, err := bcrypt.GenerateFromPassword([]byte(s), 10)
