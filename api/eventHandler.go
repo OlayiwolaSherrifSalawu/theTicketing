@@ -14,12 +14,18 @@ func (a *Application) CreateEvent(w http.ResponseWriter, r *http.Request) {
 	newEvent := new(model.Event)
 	err := json.NewDecoder(r.Body).Decode(newEvent)
 	if err != nil {
-		a.serverError(w, err)
+		a.clientError(w, http.StatusBadRequest)
 		return
 	}
 	ctx, cancel := context.WithTimeout(r.Context(), time.Second*3)
 	defer cancel()
 	err = a.TheTicket.InsertT(ctx, newEvent)
+	if err != nil {
+		a.serverError(w, err)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	err = json.NewEncoder(w).Encode(newEvent)
 	if err != nil {
 		a.serverError(w, err)
 		return
