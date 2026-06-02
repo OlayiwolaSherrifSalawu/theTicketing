@@ -25,10 +25,10 @@ func (a *Application) CreateEvent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(201)
 	err = json.NewEncoder(w).Encode(newEvent)
 	if err != nil {
 		a.serverError(w, err)
 		return
 	}
-	w.WriteHeader(201)
 }
