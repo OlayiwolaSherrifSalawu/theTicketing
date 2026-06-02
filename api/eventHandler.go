@@ -32,3 +32,5 @@ func (a *Application) CreateEvent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+
+
