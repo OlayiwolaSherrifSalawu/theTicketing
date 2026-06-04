@@ -33,4 +33,6 @@ func (a *Application) CreateEvent(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-
+func (a *Application) GetEvent(w http.ResponseWriter, r *http.Request){
+	
+}
