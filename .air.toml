@@ -1,0 +1,4 @@
+[build]
+
+cmd = "./tmp/main ./cmd/main.go"
+bin = "./tmp/main"

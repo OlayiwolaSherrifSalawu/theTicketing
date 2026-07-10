@@ -1,0 +1,7 @@
+services:
+ web-app:
+  ports:
+  - "8080:8920"
+  volumes:
+  - "./:/app"
+  
