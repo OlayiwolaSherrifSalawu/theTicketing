@@ -33,6 +33,13 @@ func (a *Application) CreateEvent(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (a *Application) GetEvent(w http.ResponseWriter, r *http.Request){
-	
+func (a *Application) GetEvent(w http.ResponseWriter, r *http.Request) {
+	r.Body = http.MaxBytesReader(w, r.Body, 1234)
+	newmap := map[string]string{}
+	paths := r.URL.Query()
+	for key, val := range paths {
+		if key == "location" {
+			newmap[key] = val[0]
+		}
+	}
 }
