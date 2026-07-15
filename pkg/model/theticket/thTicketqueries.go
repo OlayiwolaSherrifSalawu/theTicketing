@@ -2,6 +2,7 @@ package theticket
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/OlayiwolaSherrifSalawu/theTicketing.git/pkg/model"
 )
@@ -21,5 +22,20 @@ func (d *TheTicketModel) InsertT(ctx context.Context, Event *model.Event) error 
 	return nil
 }
 func (d *TheTicketModel) GetAllEvents(ctx context.Context, url map[string]string) ([]*model.Event, error) {
-	stmt := "select id, location, start_time, available_tickets, tickets_types, event_name, total_capacity where"
+	stmt := "select id, location, start_time, available_tickets, tickets_types, event_name, total_capacity where 1=1"
+	store := []any{}
+	count := 1
+	if val, ok := url["location"]; ok {
+		val := "%" + val + "%"
+		stmt = stmt + " AND location ILIKE $" + strconv.Itoa(count)
+		store = append(store, val)
+		count++
+	}
+	if val, ok := url["eventName"]; ok {
+		val := "%" + val + "%"
+		stmt = stmt + " AND location ILIKE $" + strconv.Itoa(count)
+		store = append(store, val)
+		count++
+	}
+
 }

@@ -7,4 +7,4 @@ CREATE TABLE IF NOT EXISTS events(
     event_name VARCHAR(255) NOT NULL,
     total_capacity INT NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-);
+);  
