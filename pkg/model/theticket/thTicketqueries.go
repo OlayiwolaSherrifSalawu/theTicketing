@@ -38,4 +38,23 @@ func (d *TheTicketModel) GetAllEvents(ctx context.Context, url map[string]string
 		count++
 	}
 
+	rows, err := d.DB.QueryContext(ctx, stmt, store...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	Events := []*model.Event{}
+	for rows.Next() {
+		event := model.Event{}
+		err := rows.Scan(&event.Id, &event.Location, &event.StartTime, &event.AvailableTickets, &event.TicketsTypes, &event.TotalCapacity)
+		if err != nil {
+			return nil, err
+		}
+		Events = append(Events, &event)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return Events, nil
 }
