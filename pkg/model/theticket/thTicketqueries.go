@@ -20,3 +20,6 @@ func (d *TheTicketModel) InsertT(ctx context.Context, Event *model.Event) error 
 	tx.Commit()
 	return nil
 }
+func (d *TheTicketModel) GetAllEvents(ctx context.Context, url map[string]string) ([]*model.Event, error) {
+	stmt := "select id, location, start_time, available_tickets, tickets_types, event_name, total_capacity where"
+}
