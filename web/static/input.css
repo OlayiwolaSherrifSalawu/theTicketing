@@ -1,0 +1,7 @@
+@import "tailwindcss";
+
+@theme {
+  --color-indigo-frame: #160572;
+  --color-cream-paper: #f2ebe6;
+  /* ...rest of the block from DESIGN.md */
+}
