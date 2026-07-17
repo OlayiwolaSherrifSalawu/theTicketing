@@ -68,16 +68,21 @@ func (a *Application) LoginUser(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), 3*time.Second)
 	defer cancel()
 	err = a.TheTicket.GetByEmail(ctx, dtoInput.EmailAddress, fetechedUser)
+	a.InfoLogger.Println("my love is jesu")
 	if err != nil {
 		a.clientError(w, http.StatusUnauthorized)
 		return
 	}
+	a.InfoLogger.Println("my love is jesu2")
+
 	err = bcrypt.CompareHashAndPassword([]byte(fetechedUser.HashPassword), []byte(dtoInput.Password))
 	if err != nil {
 		a.clientError(w, http.StatusUnauthorized)
 		return
 
 	}
+	a.InfoLogger.Println("my love is jesu3")
+
 	dtoInput = dto{}
 	tokenss, err := GenerateToken(fetechedUser.ID)
 	if err != nil {
