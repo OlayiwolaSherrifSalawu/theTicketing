@@ -41,5 +41,8 @@ func (a *Application) GetEvent(w http.ResponseWriter, r *http.Request) {
 		if key == "location" {
 			newmap[key] = val[0]
 		}
+		if key== "eventName"{
+			newmap[key]=val[0]
+		}
 	}
 }
