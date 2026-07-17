@@ -50,7 +50,15 @@ func (a *Application) GetEvent(w http.ResponseWriter, r *http.Request) {
 
 	newEvents, err := a.TheTicket.GetAllEvents(context, newmap)
 	if err != nil {
-		a.clientError(w, 401)
+		a.serverError(w, err)
 		return
 	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(201)
+	err = json.NewEncoder(w).Encode(newEvents)
+	if err != nil {
+		a.serverError(w, err)
+		return
+	}
+	
 }
