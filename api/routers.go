@@ -8,5 +8,6 @@ func (a *Application) routers() http.Handler {
 	mux.HandleFunc("POST /login", a.LoginUser)
 	mux.Handle("GET /dashboard", a.RequireAuthentication(http.HandlerFunc(a.DownLoadHandler)))
 	mux.HandleFunc("POST /events", a.CreateEvent)
+	mux.HandleFunc("GET /events", a.GetEvent)
 	return a.RecoverPanic(a.XssProtection(a.LogMessage(mux)))
 }

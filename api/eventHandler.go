@@ -34,7 +34,6 @@ func (a *Application) CreateEvent(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *Application) GetEvent(w http.ResponseWriter, r *http.Request) {
-	r.Body = http.MaxBytesReader(w, r.Body, 1234)
 	newmap := map[string]string{}
 	paths := r.URL.Query()
 	for key, val := range paths {
@@ -54,11 +53,10 @@ func (a *Application) GetEvent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(201)
+	w.WriteHeader(200)
 	err = json.NewEncoder(w).Encode(newEvents)
 	if err != nil {
 		a.serverError(w, err)
 		return
 	}
-	
 }
