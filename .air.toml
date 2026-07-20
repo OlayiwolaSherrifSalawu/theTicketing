@@ -1,4 +1,6 @@
 [build]
 
-cmd = "./tmp/main ./cmd/main.go"
+cmd = "./cmd/main.go"
 bin = "./tmp/main"
+
+exculde_dir= ["node_modules"]
