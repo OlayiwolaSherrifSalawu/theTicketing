@@ -22,7 +22,7 @@ func (d *TheTicketModel) InsertT(ctx context.Context, Event *model.Event) error 
 	return nil
 }
 	func (d *TheTicketModel) GetAllEvents(ctx context.Context, url map[string]string) ([]*model.Event, error) {
-		stmt := "select id, location, start_time, available_tickets, tickets_types, event_name, total_capacity from where 1=1"
+		stmt := "select id, location, start_time, available_tickets, tickets_types, event_name, total_capacity from events where 1=1"
 		store := []any{}
 		count := 1
 		if val, ok := url["location"]; ok {

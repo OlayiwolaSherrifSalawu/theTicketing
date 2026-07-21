@@ -48,10 +48,12 @@ func (a *Application) GetEvent(w http.ResponseWriter, r *http.Request) {
 	defer cancel()
 
 	newEvents, err := a.TheTicket.GetAllEvents(context, newmap)
+
 	if err != nil {
 		a.serverError(w, err)
 		return
 	}
+	a.InfoLogger.Println("hi")
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
 	err = json.NewEncoder(w).Encode(newEvents)
@@ -59,4 +61,6 @@ func (a *Application) GetEvent(w http.ResponseWriter, r *http.Request) {
 		a.serverError(w, err)
 		return
 	}
+	a.InfoLogger.Println("hi")
+
 }
