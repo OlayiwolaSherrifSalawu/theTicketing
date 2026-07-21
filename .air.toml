@@ -1,6 +1,6 @@
 [build]
 
-cmd = "./cmd/main.go"
+cmd = "go build -o ./tmp/main ./cmd/main.go"
 bin = "./tmp/main"
 
-exculde_dir= ["node_modules"]
+exclude_dir= ["node_modules"]
