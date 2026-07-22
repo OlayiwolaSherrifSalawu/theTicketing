@@ -9,5 +9,11 @@ func (a *Application) routers() http.Handler {
 	mux.Handle("GET /dashboard", a.RequireAuthentication(http.HandlerFunc(a.DownLoadHandler)))
 	mux.HandleFunc("POST /events", a.CreateEvent)
 	mux.HandleFunc("GET /events", a.GetEvent)
+
+
+	mux.HandleFunc("GET /signup", a.SignupPageHandler)
+	mux.HandleFunc("POST /signup", a.SignupFormHandler)
+	mux.Handle("GET /static/", http.StripPrefix("/static/", http.FileServer(http.Dir("web/static"))))
+
 	return a.RecoverPanic(a.XssProtection(a.LogMessage(mux)))
 }
