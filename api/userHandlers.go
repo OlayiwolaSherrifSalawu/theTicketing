@@ -28,7 +28,10 @@ func (a *Application) CreateUserHandler(w http.ResponseWriter, r *http.Request) 
 		a.clientError(w, http.StatusBadRequest)
 		return
 	}
-
+if len(inputDto.Password) < 8 {
+		a.clientErrorJSON(w, http.StatusUnprocessableEntity, "password", "Password must be at least 8 characters long.")
+		return
+	}
 	HashPassword, err := hashPassword(inputDto.Password)
 	if err != nil {
 		a.clientError(w, http.StatusBadRequest)

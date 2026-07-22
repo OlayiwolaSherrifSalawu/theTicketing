@@ -1,10 +1,22 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"runtime/debug"
 )
+
+type apiError struct {
+	Field   string `json:"field,omitempty"`
+	Message string `json:"error"`
+}
+
+func (a *Application) clientErrorJSON(w http.ResponseWriter, status int, field, message string) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	json.NewEncoder(w).Encode(apiError{Field: field, Message: message})
+}
 
 type ConstantError string
 

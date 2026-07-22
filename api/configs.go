@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/OlayiwolaSherrifSalawu/theTicketing.git/pkg/model/theticket"
+	"github.com/OlayiwolaSherrifSalawu/theTicketing.git/web"
 	"github.com/joho/godotenv"
 	"github.com/lib/pq"
 	_ "github.com/lib/pq"
@@ -29,13 +30,20 @@ type Application struct {
 	InfoLogger  *log.Logger
 	DB          *sql.DB
 	TheTicket   *theticket.TheTicketModel
+	Templates   web.TemplateCache
 }
 
-func NewApplication(db *sql.DB) *Application {
+func NewApplication(db *sql.DB) (*Application, error) {
+	templateCache, err := web.NewTemplateCache()
+	if err != nil {
+		return nil, err
+	}
+
 	return &Application{
 		DB:        db,
 		TheTicket: &theticket.TheTicketModel{DB: db},
-	}
+		Templates: templateCache,
+	}, nil
 }
 func NewAppInterface(s *Application) AppInterface {
 	return s
@@ -50,7 +58,7 @@ func (a *Application) Run() {
 	flag.Parse()
 
 	// creating a server
-	newMux :=a.routers() 
+	newMux := a.routers()
 	serve := http.Server{
 		Addr:     a.Port,
 		Handler:  newMux,

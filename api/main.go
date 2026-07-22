@@ -16,7 +16,10 @@ func Run() {
 		newLog.Println(errr)
 		return
 	}
-	app := NewApplication(sqlVAL)
+	app, err := NewApplication(sqlVAL)
+	if err != nil {
+		newLog.Println(err)
+	}
 	errors := app.RunDBMigration(sqlVAL)
 	if errors != nil {
 		newLog.Println(errors)
