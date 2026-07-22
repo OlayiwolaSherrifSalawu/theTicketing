@@ -1,0 +1,54 @@
+{{define "login_form"}}
+{{if .Error}}
+<div class="mb-4 rounded-lg border border-brand-100 bg-brand-50 px-4 py-3 text-sm text-brand-700">
+  {{.Error}}
+</div>
+{{end}}
+
+<form
+  hx-post="/login-form"
+  hx-ext="json-enc"
+  hx-target="#login-form-wrapper"
+  hx-swap="innerHTML"
+  class="space-y-5"
+>
+  <div>
+    <label for="emailAddress" class="mb-1.5 block text-sm font-medium text-ink">Email Address</label>
+    <input
+      id="emailAddress" name="emailAddress" type="email" required
+      value="{{.Email}}"
+      placeholder="jane@example.com"
+      class="w-full rounded-lg border border-hairline px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-faint focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+    />
+  </div>
+
+  <div>
+    <label for="password" class="mb-1.5 block text-sm font-medium text-ink">Password</label>
+    <div class="relative">
+      <input
+        id="password" name="password" type="password" required
+        placeholder="••••••••"
+        class="w-full rounded-lg border border-hairline px-3.5 py-2.5 pr-11 text-sm text-ink placeholder:text-ink-faint focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+      />
+      <button
+        type="button"
+        onclick="const p=document.getElementById('password'); p.type = p.type === 'password' ? 'text' : 'password';"
+        class="absolute inset-y-0 right-0 flex items-center pr-3 text-ink-faint hover:text-ink-soft"
+        aria-label="Show password"
+      >
+        <svg class="h-4 w-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M1 10s3-6 9-6 9 6 9 6-3 6-9 6-9-6-9-6Z" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="10" cy="10" r="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <button
+    type="submit"
+    class="w-full rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-600"
+  >
+    Log In
+  </button>
+</form>
+{{end}}

@@ -26,7 +26,56 @@ func (r *responseRecorder) Header() http.Header         { return r.header }
 func (r *responseRecorder) Write(b []byte) (int, error) { return r.body.Write(b) }
 func (r *responseRecorder) WriteHeader(status int)      { r.status = status }
 
-// SignupPageHandler renders the signup page on a normal GET.
+// LoginPageHandler renders the login page on a normal GET.
+func (a *Application) LoginPageHandler(w http.ResponseWriter, r *http.Request) {
+	if err := a.Templates.Render(w, http.StatusOK, "login.tmpl", map[string]any{}); err != nil {
+		a.serverError(w, err)
+	}
+}
+
+// LoginFormHandler wraps LoginUser the same way SignupFormHandler wraps
+// CreateUserHandler. One difference from signup: LoginUser only ever
+// returns a bare 401 on bad credentials — deliberately not distinguishing
+// "no such email" from "wrong password" (that distinction is exactly what
+// you don't want to leak to an attacker doing account enumeration). So
+// unlike signup, we don't try to unpack a structured field error here —
+// any 4xx/5xx just becomes one generic message.
+func (a *Application) LoginFormHandler(w http.ResponseWriter, r *http.Request) {
+	bodyBytes, err := io.ReadAll(r.Body)
+	if err != nil {
+		a.serverError(w, err)
+		return
+	}
+
+	var submitted dto
+	_ = json.Unmarshal(bodyBytes, &submitted)
+
+	r.Body = io.NopCloser(bytes.NewReader(bodyBytes))
+	rec := newResponseRecorder()
+	a.LoginUser(rec, r)
+
+	if rec.status >= http.StatusBadRequest {
+		data := map[string]any{
+			"Email": submitted.EmailAddress,
+			"Error": "Incorrect email or password.",
+		}
+		if err := a.Templates.RenderPartial(w, rec.status, "login.tmpl", "login_form", data); err != nil {
+			a.serverError(w, err)
+		}
+		return
+	}
+
+	// LoginUser sets the "access" cookie via http.SetCookie on the
+	// recorder's header — that only exists in our buffer right now, so we
+	// have to copy it onto the real ResponseWriter before it does anything
+	// useful for the browser.
+	for _, cookie := range rec.header.Values("Set-Cookie") {
+		w.Header().Add("Set-Cookie", cookie)
+	}
+
+	w.Header().Set("HX-Redirect", "/dashboard")
+	w.WriteHeader(http.StatusOK)
+}
 func (a *Application) SignupPageHandler(w http.ResponseWriter, r *http.Request) {
 	if err := a.Templates.Render(w, http.StatusOK, "signup.tmpl", map[string]any{}); err != nil {
 		a.serverError(w, err)

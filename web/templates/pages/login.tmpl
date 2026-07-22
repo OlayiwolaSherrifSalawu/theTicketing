@@ -1,0 +1,19 @@
+{{define "title"}}Log In{{end}}
+
+{{define "content"}}
+<main class="flex min-h-screen flex-col items-center justify-center px-4 py-12">
+  <div class="w-full max-w-md rounded-2xl border border-hairline bg-white p-8">
+    <h1 class="text-center text-2xl font-bold text-brand-500">theTicketing</h1>
+    <p class="mt-1 text-center text-sm text-ink-soft">Welcome back. Please enter your details.</p>
+
+    <div id="login-form-wrapper" class="mt-6">
+      {{template "login_form" .}}
+    </div>
+
+    <p class="mt-6 text-center text-sm text-ink-soft">
+      Don't have an account?
+      <a href="/signup" class="font-semibold text-brand-500 hover:text-brand-600">Sign up</a>
+    </p>
+  </div>
+</main>
+{{end}}
