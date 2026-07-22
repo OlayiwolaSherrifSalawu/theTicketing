@@ -21,6 +21,11 @@ func (a *Application) routers() http.Handler {
 	mux.HandleFunc("GET /login", a.LoginPageHandler)
 	mux.HandleFunc("POST /login-form", a.LoginFormHandler)
 
+	// "{$}" matches exactly "/" (not a subtree) so it doesn't swallow
+	// every unmatched path as the homepage.
+	mux.HandleFunc("GET /{$}", a.HomePageHandler)
+	mux.HandleFunc("GET /events-partial", a.EventsPartialHandler)
+
 	// Static assets: web/static/css/output.css (Tailwind build) and
 	// web/static/js/*.js (vendored htmx + json-enc extension — no CDN
 	// dependency, works offline).
