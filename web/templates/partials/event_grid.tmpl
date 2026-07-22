@@ -1,0 +1,26 @@
+{{define "event_grid"}}
+{{if not .Events}}
+<p class="col-span-full py-12 text-center text-ink-soft">No events found. Try a different search.</p>
+{{else}}
+{{range .Events}}
+<article class="overflow-hidden rounded-2xl border border-hairline bg-white">
+  <div class="relative">
+    <img src="{{.ImageURL}}" alt="{{.Name}}" class="h-44 w-full object-cover" loading="lazy" />
+  </div>
+  <div class="p-5">
+    <div class="flex items-center justify-between text-xs font-semibold">
+      <span class="uppercase tracking-wide text-brand-500">{{.Category}}</span>
+      <span class="rounded-full px-2.5 py-1 {{.StatusClass}}">{{.StatusLabel}}</span>
+    </div>
+    <h3 class="mt-2 text-lg font-bold text-ink">{{.Name}}</h3>
+    <p class="mt-1 flex items-center gap-1 text-sm text-ink-soft">{{.DateLabel}}</p>
+    <p class="mt-0.5 flex items-center gap-1 text-sm text-ink-soft">{{.Location}}</p>
+    <div class="mt-4 flex items-center justify-between border-t border-hairline pt-4">
+      <span class="text-xs text-ink-faint">Tickets from</span>
+      <span class="text-base font-bold text-ink">{{.PriceLabel}}</span>
+    </div>
+  </div>
+</article>
+{{end}}
+{{end}}
+{{end}}
