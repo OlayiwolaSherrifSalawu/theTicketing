@@ -1,0 +1,16 @@
+{{define "base"}}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{block "title" .}}theTicketing{{end}} · theTicketing</title>
+  <link rel="stylesheet" href="/static/css/output.css" />
+  <script src="/static/js/htmx.min.js"></script>
+  <script src="/static/js/htmx-json-enc.js"></script>
+</head>
+<body class="min-h-screen bg-brand-50 font-sans text-ink antialiased">
+  {{block "content" .}}{{end}}
+</body>
+</html>
+{{end}}

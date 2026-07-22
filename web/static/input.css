@@ -1,7 +1,22 @@
 @import "tailwindcss";
 
+/*
+ * Design tokens for theTicketing — sourced from the reference screenshots
+ * (homeScreen, login, signUp), not DESIGN.md. Single coral/orange-red brand
+ * color used consistently across CTAs, links, and the logo mark.
+ */
 @theme {
-  --color-indigo-frame: #160572;
-  --color-cream-paper: #f2ebe6;
-  /* ...rest of the block from DESIGN.md */
+  --color-brand-50: #fef2f0;
+  --color-brand-100: #fde3de;
+  --color-brand-500: #f0472e;
+  --color-brand-600: #d93d26;
+  --color-brand-700: #b83320;
+
+  --color-ink: #111827;
+  --color-ink-soft: #4b5563;
+  --color-ink-faint: #9ca3af;
+
+  --color-hairline: #e5e7eb;
+
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
 }

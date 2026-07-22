@@ -1,0 +1,62 @@
+{{define "signup_form"}}
+{{if .Error}}
+<div class="mb-4 rounded-lg border border-brand-100 bg-brand-50 px-4 py-3 text-sm text-brand-700">
+  {{.Error}}
+</div>
+{{end}}
+
+<form
+  hx-post="/signup"
+  hx-ext="json-enc"
+  hx-target="#signup-form-wrapper"
+  hx-swap="innerHTML"
+  class="space-y-5"
+>
+  <div>
+    <label for="emailAddress" class="mb-1.5 block text-sm font-medium text-ink">Email Address</label>
+    <input
+      id="emailAddress" name="emailAddress" type="email" required
+      value="{{.Email}}"
+      placeholder="jane@example.com"
+      class="w-full rounded-lg border border-hairline px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-faint focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+    />
+  </div>
+
+  <div>
+    <label for="userName" class="mb-1.5 block text-sm font-medium text-ink">Username</label>
+    <input
+      id="userName" name="userName" type="text" required
+      value="{{.Username}}"
+      placeholder="janedoe"
+      class="w-full rounded-lg border border-hairline px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-faint focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+    />
+  </div>
+
+  <div>
+    <label for="password" class="mb-1.5 block text-sm font-medium text-ink">Password</label>
+    <input
+      id="password" name="password" type="password" required minlength="8"
+      placeholder="••••••••"
+      class="w-full rounded-lg border {{if .PasswordError}}border-brand-500{{else}}border-hairline{{end}} px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-faint focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+    />
+    <p class="mt-1.5 text-xs {{if .PasswordError}}text-brand-600{{else}}text-ink-faint{{end}}">
+      {{if .PasswordError}}{{.PasswordError}}{{else}}Must be at least 8 characters long.{{end}}
+    </p>
+  </div>
+
+  <label class="flex items-start gap-2 text-sm text-ink-soft">
+    <input type="checkbox" required class="mt-0.5 h-4 w-4 rounded border-hairline text-brand-500 focus:ring-brand-500" />
+    <span>I agree to the <a href="/terms" class="text-brand-500 hover:underline">Terms of Service</a> and <a href="/privacy" class="text-brand-500 hover:underline">Privacy Policy</a>.</span>
+  </label>
+
+  <button
+    type="submit"
+    class="flex w-full items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-600"
+  >
+    Create Account
+    <svg class="h-4 w-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M4 10h12M12 6l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+</form>
+{{end}}
