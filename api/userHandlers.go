@@ -28,7 +28,7 @@ func (a *Application) CreateUserHandler(w http.ResponseWriter, r *http.Request) 
 		a.clientError(w, http.StatusBadRequest)
 		return
 	}
-if len(inputDto.Password) < 8 {
+	if len(inputDto.Password) < 8 {
 		a.clientErrorJSON(w, http.StatusUnprocessableEntity, "password", "Password must be at least 8 characters long.")
 		return
 	}
@@ -71,19 +71,18 @@ func (a *Application) LoginUser(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), 3*time.Second)
 	defer cancel()
 	err = a.TheTicket.GetByEmail(ctx, dtoInput.EmailAddress, fetechedUser)
-	
+
 	if err != nil {
 		a.clientError(w, http.StatusUnauthorized)
 		return
 	}
-	
+
 	err = bcrypt.CompareHashAndPassword([]byte(fetechedUser.HashPassword), []byte(dtoInput.Password))
 	if err != nil {
 		a.clientError(w, http.StatusUnauthorized)
 		return
 
 	}
-	
 
 	dtoInput = dto{}
 	tokenss, err := GenerateToken(fetechedUser.ID)
@@ -110,7 +109,7 @@ func (a *Application) LoginUser(w http.ResponseWriter, r *http.Request) {
 		SameSite: http.SameSiteLaxMode,
 	})
 
-	// http.Redirect(w, r, "/dashboard", http.StatusSeeOther)
+	http.Redirect(w, r, "/dashboard", http.StatusSeeOther)
 }
 
 func (a *Application) DownLoadHandler(w http.ResponseWriter, r *http.Request) {
