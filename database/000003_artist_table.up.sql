@@ -4,5 +4,4 @@ CREATE TABLE IF NOT EXISTS artist(
     formation_date TIMESTAMP, 
     image VARCHAR(255),
     members TEXT[],
-
-)
+);
