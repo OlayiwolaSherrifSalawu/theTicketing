@@ -34,11 +34,11 @@ type Artists struct {
 
 type Location struct {
 	Id        int      `json:"id"`
-	Locations []string `json:"eventsData"`
+	Locations []string `json:"locations"`
 }
 
 type Date struct {
-	Id    int   `json:"id"`
+	Id    int      `json:"id"`
 	Dates []string `json:"Dates"`
 }
 
