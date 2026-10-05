@@ -25,11 +25,23 @@ type Event struct {
 type Artists struct {
 	ArtistId      string   `json:"artist_id"`
 	Name          string   `json:"name"`
-	FormationDate string   `json:"formationDate"`
+	FormationDate int      `json:"formationDate"`
 	ImageUrl      string   `json:"imageUrl"`
 	Members       []string `json:"members"`
+	ExternalId    int      `json:"externalId"`
 }
 
 type Location struct {
-	
+	Id         string   `json:"id"`
+	EventsData []string `json:"eventsData"`
+}
+
+type Date struct {
+	Id           string `json:"id"`
+	ConcertsDate []int  `json:"concertsDates"`
+}
+
+type Relation struct {
+	Id       int
+	JsonData map[string]string `json:"jsonData"`
 }
