@@ -21,3 +21,15 @@ type Event struct {
 	EventName        string    `json:"eventName"`
 	TotalCapacity    int       `json:"totalCapacity"`
 }
+
+type Artists struct {
+	ArtistId      string   `json:"artist_id"`
+	Name          string   `json:"name"`
+	FormationDate string   `json:"formationDate"`
+	ImageUrl      string   `json:"imageUrl"`
+	Members       []string `json:"members"`
+}
+
+type Location struct {
+	
+}
