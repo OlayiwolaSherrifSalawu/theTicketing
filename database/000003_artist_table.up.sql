@@ -8,4 +8,4 @@ CREATE TABLE IF NOT EXISTS artist(
     external_id INT
 );
 ALTER TABLE events
-ADD COLUMN artist_id uuid REFERENCES artist(artist_id) ON DELETE CASCADE;
+ADD COLUMN artist_id uuid REFERENCES artist(artist_id) ON DELETE CASCADE

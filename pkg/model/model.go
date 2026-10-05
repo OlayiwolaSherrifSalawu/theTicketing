@@ -23,12 +23,13 @@ type Event struct {
 }
 
 type Artists struct {
-	ArtistId     string   `json:"artist_id"`
+	ArtistId     string   `json:"-"`
 	Name         string   `json:"name"`
-	CreationDate int      `json:"formationDate"`
+	CreationDate int      `json:"creationDate"`
 	Image        string   `json:"imageUrl"`
 	Members      []string `json:"members"`
 	ExternalId   int      `json:"externalId"`
+	FirstAlbum   string   `json:"firstAlbum"`
 }
 
 type Location struct {
@@ -38,7 +39,7 @@ type Location struct {
 
 type Date struct {
 	Id    int   `json:"id"`
-	Dates []int `json:"concertsDates"`
+	Dates []string `json:"Dates"`
 }
 
 type Relation struct {
