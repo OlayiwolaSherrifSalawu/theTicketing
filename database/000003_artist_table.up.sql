@@ -5,5 +5,7 @@ CREATE TABLE IF NOT EXISTS artist(
     image VARCHAR(255),
     members TEXT[],
     first_album TEXT,
-    events_id uuid REFERENCES events(id) ON DELETE CASCADE
 );
+
+ALTER TABLE events;
+ADD COLUMN artist_id uuid REFERENCES artist(artist_id) ON DELETE CASCADE
