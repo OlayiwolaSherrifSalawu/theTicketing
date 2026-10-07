@@ -115,8 +115,9 @@ func (a *Application) LoginUser(w http.ResponseWriter, r *http.Request) {
 func (a *Application) DownLoadHandler(w http.ResponseWriter, r *http.Request) {
 	if userId, ok := extractUserFromContext(r.Context()); ok {
 		fmt.Fprintf(w, "welcome user %s", userId)
+
 		return
 	}
-	fmt.Fprint(w, "error getting your token")
+	fmt.Fprint(w, "error getting your tokens")
 	a.clientError(w, http.StatusUnauthorized)
 }
