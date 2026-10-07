@@ -21,3 +21,28 @@ type Event struct {
 	EventName        string    `json:"eventName"`
 	TotalCapacity    int       `json:"totalCapacity"`
 }
+
+type Artists struct {
+	ArtistId     string   `json:"-"`
+	Name         string   `json:"name"`
+	CreationDate int      `json:"creationDate"`
+	Image        string   `json:"imageUrl"`
+	Members      []string `json:"members"`
+	ExternalId   int      `json:"externalId"`
+	FirstAlbum   string   `json:"firstAlbum"`
+}
+
+type Location struct {
+	Id        int      `json:"id"`
+	Locations []string `json:"locations"`
+}
+
+type Date struct {
+	Id    int      `json:"id"`
+	Dates []string `json:"Dates"`
+}
+
+type Relation struct {
+	Id       int
+	JsonData map[string]string `json:"jsonData"`
+}
