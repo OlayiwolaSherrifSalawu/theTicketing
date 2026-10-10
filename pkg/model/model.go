@@ -46,3 +46,5 @@ type Relation struct {
 	Id       int
 	JsonData map[string][]string `json:"datesLocations"`
 }
+
+// getting this stuff started
