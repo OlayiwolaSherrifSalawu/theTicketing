@@ -1,6 +1,9 @@
 package model
 
-import "time"
+import (
+	"net/http"
+	"time"
+)
 
 // data model Define Data model
 
@@ -47,4 +50,27 @@ type Relation struct {
 	JsonData map[string][]string `json:"datesLocations"`
 }
 
-// getting this stuff started
+// writing the go routines  for my reading
+type Data struct {
+	Artists   []Artists
+	Locations []Location
+	Dates     []Date
+	Relations []Relation
+}
+
+func Fetecher(api string) Data {
+	data := Data{}
+	// making five buffered channerl
+	chanArtist := make(chan Artists)
+	chanRelations := make(chan Relation)
+	chanDate := make(chan Date)
+	chanLocation := make(chan Location)
+	chanData := make(chan Data)
+ 
+	client := &http.Client{
+		Timeout: time.Second*3,
+	}
+	go func() {
+
+	}()
+}
