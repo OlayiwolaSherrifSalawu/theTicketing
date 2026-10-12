@@ -1,6 +1,7 @@
 package model
 
 import (
+	"io"
 	"log"
 	"net/http"
 	"time"
@@ -74,10 +75,16 @@ func Fetecher(api string) *Data {
 	resp, err := client.Get(api)
 
 	if err != nil {
-		log.Println("error getting url")
+		log.Fatalln("error getting url")
 		return &Data{}
 	}
 	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		log.Fatalln("Status code bad")
+		return &Data{}
+	}
+	bytesBO, err := io.ReadAll(resp.Body)
 	go func() {
 
 	}()
