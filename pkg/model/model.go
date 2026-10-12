@@ -1,6 +1,7 @@
 package model
 
 import (
+	"log"
 	"net/http"
 	"time"
 )
@@ -58,7 +59,7 @@ type Data struct {
 	Relations []Relation
 }
 
-func Fetecher(api string) Data {
+func Fetecher(api string) *Data {
 	data := Data{}
 	// making five buffered channerl
 	chanArtist := make(chan Artists)
@@ -66,10 +67,17 @@ func Fetecher(api string) Data {
 	chanDate := make(chan Date)
 	chanLocation := make(chan Location)
 	chanData := make(chan Data)
- 
+
 	client := &http.Client{
-		Timeout: time.Second*3,
+		Timeout: time.Second * 3,
 	}
+	resp, err := client.Get(api)
+
+	if err != nil {
+		log.Println("error getting url")
+		return &Data{}
+	}
+	defer resp.Body.Close()
 	go func() {
 
 	}()
