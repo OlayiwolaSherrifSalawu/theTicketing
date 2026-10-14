@@ -12,11 +12,11 @@ import (
 func Fetecher(api string) (*model.Data, error) {
 	data := &model.Data{}
 	// making five buffered channerl
-	chanArtist := make(chan model.Artists)
-	chanRelations := make(chan model.Relation)
-	chanDate := make(chan model.Date)
-	chanLocation := make(chan model.Location)
-	chanData := make(chan model.Data)
+	chanArtist := make(chan []model.Artists, 1)
+	chanRelations := make(chan []model.Relation, 1)
+	chanDate := make(chan []model.Date, 1)
+	chanLocation := make(chan []model.Location, 1)
+	chanError := make(chan []model.Data, 4)
 
 	client := &http.Client{
 		Timeout: time.Second * 3,
@@ -24,7 +24,6 @@ func Fetecher(api string) (*model.Data, error) {
 	resp, err := client.Get(api)
 
 	if err != nil {
-		log.Println("error getting url")
 		return &model.Data{}, err
 	}
 	defer resp.Body.Close()
