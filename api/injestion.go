@@ -11,7 +11,7 @@ import (
 	"github.com/OlayiwolaSherrifSalawu/theTicketing.git/pkg/model"
 )
 
-func Fetecher(api string) (*model.Data, error) {
+func Fetcher(api string) (*model.Data, error) {
 
 	responseMap := map[string]string{
 		"artist":   "",
