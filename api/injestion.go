@@ -48,11 +48,14 @@ func Fetcher(api string) (*model.Data, error) {
 
 	for val := range responseMap {
 		url := responseMap[val]
-		go func() {
+		wg.Done()
+		go func(endPointKey, endPointUrl string) {
+			endPointKey = val
+			endPointUrl = url
 			clients := http.Client{
 				Timeout: 3 * time.Second,
 			}
-			resps, err := clients.Get(url)
+			resps, err := clients.Get(endPointUrl)
 			if err != nil {
 				go errchan(err, chanError)
 			}
@@ -66,7 +69,7 @@ func Fetcher(api string) (*model.Data, error) {
 			if err != nil {
 
 			}
-			switch val {
+			switch endPointKey {
 			case "artist":
 				errs := json.Unmarshal(respsBody, &chanArtist)
 				if errs != nil {
@@ -93,8 +96,8 @@ func Fetcher(api string) (*model.Data, error) {
 				wg.Add(1)
 
 			}
-			wg.Done()
-		}()
+
+		}(val, url)
 
 	}
 	errSlice := []error{}
