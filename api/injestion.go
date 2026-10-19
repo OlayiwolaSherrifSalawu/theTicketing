@@ -11,6 +11,16 @@ import (
 	"github.com/OlayiwolaSherrifSalawu/theTicketing.git/pkg/model"
 )
 
+type wrapperLocation struct {
+	Index []model.Location `json:"index"`
+}
+type wrapperDates struct {
+	Index []model.Date `json:"index"`
+}
+type wrapperRelation struct {
+	Index []model.Relation `json:"index"`
+}
+
 func Fetcher(api string) (*model.Data, error) {
 
 	responseMap := map[string]string{
@@ -46,10 +56,12 @@ func Fetcher(api string) (*model.Data, error) {
 	chanLocation := make(chan []model.Location, 1)
 	chanError := make(chan error, 4)
 	artistSlice := []model.Artists{}
+	locationStruct := &wrapperLocation{}
+	dateStruct := &wrapperDates{}
 	for val := range responseMap {
 		url := responseMap[val]
 		wg.Done()
-		go func(endPointKey, endPointUrl string) {
+		go func(endPointKey, endPointUrl string) error {
 			endPointKey = val
 			endPointUrl = url
 			clients := http.Client{
@@ -62,32 +74,36 @@ func Fetcher(api string) (*model.Data, error) {
 			defer resps.Body.Close()
 			if resps.StatusCode != http.StatusOK {
 				go errchan(fmt.Errorf("Bad status code"), chanError)
-				return
+				return fmt.Errorf("Bad status code")
 
 			}
 			respsBody, err := io.ReadAll(resps.Body)
 			if err != nil {
-
+				return err
 			}
 			switch endPointKey {
 			case "artist":
 				errs := json.Unmarshal(respsBody, &artistSlice)
 				if errs != nil {
 					go errchan(errs, chanError)
+					return errs
 				}
 				chanArtist <- artistSlice
 				wg.Add(1)
 			case "location":
-				errs := json.Unmarshal(respsBody, &chanLocation)
+				errs := json.Unmarshal(respsBody, &locationStruct)
 				if errs != nil {
-					go errchan(errs, chanError)
+					return err
 				}
+				chanLocation <- locationStruct.Index
 				wg.Add(1)
 			case "dates":
-				errs := json.Unmarshal(respsBody, &chanDate)
+				errs := json.Unmarshal(respsBody, &dateStruct)
 				if errs != nil {
 					go errchan(errs, chanError)
+					return errs
 				}
+				chanDate <- dateStruct.Index
 				wg.Add(1)
 			case "relations":
 				errs := json.Unmarshal(respsBody, &chanRelations)
@@ -97,7 +113,7 @@ func Fetcher(api string) (*model.Data, error) {
 				wg.Add(1)
 
 			}
-
+			return nil
 		}(val, url)
 
 	}
