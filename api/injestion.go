@@ -39,13 +39,13 @@ func Fetcher(api string) (*model.Data, error) {
 		return &model.Data{}, err
 	}
 	decoded.Decode(&responseMap)
-	// making five buffered channerl
+	// making five buffered channel
 	chanArtist := make(chan []model.Artists, 1)
 	chanRelations := make(chan []model.Relation, 1)
 	chanDate := make(chan []model.Date, 1)
 	chanLocation := make(chan []model.Location, 1)
-	chanError := make(chan []error, 4)
-
+	chanError := make(chan error, 4)
+	artistSlice := []model.Artists{}
 	for val := range responseMap {
 		url := responseMap[val]
 		wg.Done()
@@ -65,16 +65,17 @@ func Fetcher(api string) (*model.Data, error) {
 				return
 
 			}
-			respsBody, err := io.ReadAll(resp.Body)
+			respsBody, err := io.ReadAll(resps.Body)
 			if err != nil {
 
 			}
 			switch endPointKey {
 			case "artist":
-				errs := json.Unmarshal(respsBody, &chanArtist)
+				errs := json.Unmarshal(respsBody, &artistSlice)
 				if errs != nil {
 					go errchan(errs, chanError)
 				}
+				chanArtist <- artistSlice
 				wg.Add(1)
 			case "location":
 				errs := json.Unmarshal(respsBody, &chanLocation)
@@ -100,10 +101,10 @@ func Fetcher(api string) (*model.Data, error) {
 		}(val, url)
 
 	}
-	errSlice := []error{}
+	var errSlice error
 	errSlice = <-chanError
-	if len(errSlice) > 0 {
-		return &model.Data{}, errSlice[0]
+	if errSlice != nil {
+		return &model.Data{}, errSlice
 	}
 	return &model.Data{
 		Artists:   <-chanArtist,
@@ -112,6 +113,6 @@ func Fetcher(api string) (*model.Data, error) {
 		Relations: <-chanRelations,
 	}, nil
 }
-func errchan(errs error, errchan chan []error) {
-	errchan <- append(<-errchan, errs)
+func errchan(errs error, errchan chan error) {
+	errchan <- errs
 }
