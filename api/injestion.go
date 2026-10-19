@@ -58,6 +58,7 @@ func Fetcher(api string) (*model.Data, error) {
 	artistSlice := []model.Artists{}
 	locationStruct := &wrapperLocation{}
 	dateStruct := &wrapperDates{}
+	relationStruct := &wrapperRelation{}
 	for val := range responseMap {
 		url := responseMap[val]
 		wg.Done()
@@ -93,7 +94,7 @@ func Fetcher(api string) (*model.Data, error) {
 			case "location":
 				errs := json.Unmarshal(respsBody, &locationStruct)
 				if errs != nil {
-					return err
+					return errs
 				}
 				chanLocation <- locationStruct.Index
 				wg.Add(1)
@@ -106,10 +107,12 @@ func Fetcher(api string) (*model.Data, error) {
 				chanDate <- dateStruct.Index
 				wg.Add(1)
 			case "relations":
-				errs := json.Unmarshal(respsBody, &chanRelations)
+				errs := json.Unmarshal(respsBody, &relationStruct)
 				if errs != nil {
 					go errchan(errs, chanError)
+					return errs
 				}
+
 				wg.Add(1)
 
 			}
