@@ -112,7 +112,7 @@ func Fetcher(api string) (*model.Data, error) {
 					go errchan(errs, chanError)
 					return errs
 				}
-
+				chanRelations <- relationStruct.Index
 				wg.Add(1)
 
 			}
