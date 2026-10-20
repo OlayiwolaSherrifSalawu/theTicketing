@@ -48,7 +48,7 @@ func Fetcher(api string) (*model.Data, error) {
 	if err := decoded.Decode(&responseMap); err != nil {
 		return &model.Data{}, err
 	}
-	decoded.Decode(&responseMap)
+
 	// making five buffered ch only job annel
 	chanArtist := make(chan []model.Artists, 1)
 	chanRelations := make(chan []model.Relation, 1)
@@ -62,10 +62,9 @@ func Fetcher(api string) (*model.Data, error) {
 	for val := range responseMap {
 		url := responseMap[val]
 		wg.Add(1)
-		go func(endPointKey, endPointUrl string) error {
+		go func(endPointKey, endPointUrl string) {
 			defer wg.Done()
-			endPointKey = val
-			endPointUrl = url
+
 			clients := http.Client{
 				Timeout: 3 * time.Second,
 			}
@@ -76,26 +75,26 @@ func Fetcher(api string) (*model.Data, error) {
 			defer resps.Body.Close()
 			if resps.StatusCode != http.StatusOK {
 				go errchan(fmt.Errorf("Bad status code"), chanError)
-				return fmt.Errorf("Bad status code")
+				return
 
 			}
 			respsBody, err := io.ReadAll(resps.Body)
 			if err != nil {
-				return err
+				return
 			}
 			switch endPointKey {
 			case "artist":
 				errs := json.Unmarshal(respsBody, &artistSlice)
 				if errs != nil {
 					go errchan(errs, chanError)
-					return errs
+					return
 				}
 				chanArtist <- artistSlice
 
 			case "location":
 				errs := json.Unmarshal(respsBody, &locationStruct)
 				if errs != nil {
-					return errs
+					return
 				}
 				chanLocation <- locationStruct.Index
 
@@ -103,19 +102,19 @@ func Fetcher(api string) (*model.Data, error) {
 				errs := json.Unmarshal(respsBody, &dateStruct)
 				if errs != nil {
 					go errchan(errs, chanError)
-					return errs
+					return
 				}
 				chanDate <- dateStruct.Index
 
-			case "relations":
+			case "relation":
 				errs := json.Unmarshal(respsBody, &relationStruct)
 				if errs != nil {
 					go errchan(errs, chanError)
-					return errs
+					return
 				}
 				chanRelations <- relationStruct.Index
 			}
-			return nil
+
 		}(val, url)
 
 	}
