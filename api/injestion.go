@@ -49,7 +49,7 @@ func Fetcher(api string) (*model.Data, error) {
 		return &model.Data{}, err
 	}
 	decoded.Decode(&responseMap)
-	// making five buffered channel
+	// making five buffered ch only job annel
 	chanArtist := make(chan []model.Artists, 1)
 	chanRelations := make(chan []model.Relation, 1)
 	chanDate := make(chan []model.Date, 1)
@@ -61,8 +61,9 @@ func Fetcher(api string) (*model.Data, error) {
 	relationStruct := &wrapperRelation{}
 	for val := range responseMap {
 		url := responseMap[val]
-		wg.Done()
+		wg.Add(1)
 		go func(endPointKey, endPointUrl string) error {
+			defer wg.Done()
 			endPointKey = val
 			endPointUrl = url
 			clients := http.Client{
@@ -90,14 +91,14 @@ func Fetcher(api string) (*model.Data, error) {
 					return errs
 				}
 				chanArtist <- artistSlice
-				wg.Add(1)
+
 			case "location":
 				errs := json.Unmarshal(respsBody, &locationStruct)
 				if errs != nil {
 					return errs
 				}
 				chanLocation <- locationStruct.Index
-				wg.Add(1)
+
 			case "dates":
 				errs := json.Unmarshal(respsBody, &dateStruct)
 				if errs != nil {
@@ -105,7 +106,7 @@ func Fetcher(api string) (*model.Data, error) {
 					return errs
 				}
 				chanDate <- dateStruct.Index
-				wg.Add(1)
+
 			case "relations":
 				errs := json.Unmarshal(respsBody, &relationStruct)
 				if errs != nil {
@@ -113,8 +114,6 @@ func Fetcher(api string) (*model.Data, error) {
 					return errs
 				}
 				chanRelations <- relationStruct.Index
-				wg.Add(1)
-
 			}
 			return nil
 		}(val, url)
@@ -132,6 +131,7 @@ func Fetcher(api string) (*model.Data, error) {
 		Relations: <-chanRelations,
 	}, nil
 }
+
 func errchan(errs error, errchan chan error) {
 	errchan <- errs
 }
