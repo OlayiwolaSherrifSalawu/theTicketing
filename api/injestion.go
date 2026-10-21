@@ -59,6 +59,7 @@ func Fetcher(api string) (*model.Data, error) {
 	locationStruct := &wrapperLocation{}
 	dateStruct := &wrapperDates{}
 	relationStruct := &wrapperRelation{}
+	done := make(chan bool)
 	for val := range responseMap {
 		url := responseMap[val]
 		wg.Add(1)
@@ -118,10 +119,16 @@ func Fetcher(api string) (*model.Data, error) {
 		}(val, url)
 
 	}
-	var errSlice error
-	errSlice = <-chanError
-	if errSlice != nil {
-		return &model.Data{}, errSlice
+	go func() {
+		wg.Wait()
+		done <- true
+	}()
+
+	select {
+	case err := <-chanError:
+		return &model.Data{}, err
+	case <-done:
+
 	}
 	return &model.Data{
 		Artists:   <-chanArtist,
