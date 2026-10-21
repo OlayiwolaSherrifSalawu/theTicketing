@@ -23,12 +23,7 @@ type wrapperRelation struct {
 
 func Fetcher(api string) (*model.Data, error) {
 
-	responseMap := map[string]string{
-		"artist":   "",
-		"location": "",
-		"dates":    "",
-		"relation": "",
-	}
+	responseMap := map[string]string{}
 	client := &http.Client{
 		Timeout: time.Second * 3,
 	}
@@ -72,6 +67,7 @@ func Fetcher(api string) (*model.Data, error) {
 			resps, err := clients.Get(endPointUrl)
 			if err != nil {
 				go errchan(err, chanError)
+				return
 			}
 			defer resps.Body.Close()
 			if resps.StatusCode != http.StatusOK {
@@ -84,17 +80,19 @@ func Fetcher(api string) (*model.Data, error) {
 				return
 			}
 			switch endPointKey {
-			case "artist":
+			case "artists":
 				errs := json.Unmarshal(respsBody, &artistSlice)
 				if errs != nil {
-					go errchan(errs, chanError)
+					errchan(errs, chanError)
 					return
 				}
 				chanArtist <- artistSlice
 
-			case "location":
+			case "locations":
 				errs := json.Unmarshal(respsBody, &locationStruct)
+
 				if errs != nil {
+					errchan(errs, chanError)
 					return
 				}
 				chanLocation <- locationStruct.Index
@@ -102,15 +100,15 @@ func Fetcher(api string) (*model.Data, error) {
 			case "dates":
 				errs := json.Unmarshal(respsBody, &dateStruct)
 				if errs != nil {
-					go errchan(errs, chanError)
+					errchan(errs, chanError)
 					return
 				}
 				chanDate <- dateStruct.Index
 
-			case "relation":
+			case "relations":
 				errs := json.Unmarshal(respsBody, &relationStruct)
 				if errs != nil {
-					go errchan(errs, chanError)
+					errchan(errs, chanError)
 					return
 				}
 				chanRelations <- relationStruct.Index
