@@ -77,6 +77,7 @@ func Fetcher(api string) (*model.Data, error) {
 			}
 			respsBody, err := io.ReadAll(resps.Body)
 			if err != nil {
+				errchan(err, chanError)
 				return
 			}
 			switch endPointKey {
@@ -105,7 +106,7 @@ func Fetcher(api string) (*model.Data, error) {
 				}
 				chanDate <- dateStruct.Index
 
-			case "relations":
+			case "relation":
 				errs := json.Unmarshal(respsBody, &relationStruct)
 				if errs != nil {
 					errchan(errs, chanError)
@@ -115,7 +116,6 @@ func Fetcher(api string) (*model.Data, error) {
 			}
 
 		}(val, url)
-
 	}
 	go func() {
 		wg.Wait()
