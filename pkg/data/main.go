@@ -4,6 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"strconv"
+	"strings"
+	"time"
 
 	"github.com/OlayiwolaSherrifSalawu/theTicketing.git/pkg/model"
 )
@@ -26,6 +28,14 @@ func SaveData(ctx context.Context, db *sql.DB, data *model.Data) error {
 		err := tx.QueryRowContext(ctx, SqlQuery, data.Artists, val.Name, formationDate, val.Image, val.FirstAlbum, val.Members).Scan(&generateString)
 		if err != nil {
 			return err
+		}
+		for key, vals := range ds[val.ExternalId] {
+			key = strings.ReplaceAll(strings.ReplaceAll(key, "-", " "), "_", " ")
+			key = strings.ToTitle(key)
+			for _, dates := range vals {
+				var date time.Time
+				dates = time.Time.Local(date).Format(dates)
+			}
 		}
 	}
 	tx.Commit()
