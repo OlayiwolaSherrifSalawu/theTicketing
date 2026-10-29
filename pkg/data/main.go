@@ -24,8 +24,8 @@ func SaveData(ctx context.Context, db *sql.DB, data *model.Data) error {
 	for _, val := range data.Artists {
 		var generateString string
 		formationDate := strconv.Itoa(val.CreationDate)
-		SqlQuery := `INSERT INTO artist(name, formation_date, image, first_album, members, external_id) RETURNING artist_id VALUES($1,$2,$3,$4,$5,$6)`
-		err := tx.QueryRowContext(ctx, SqlQuery, data.Artists, val.Name, formationDate, val.Image, val.FirstAlbum, val.Members).Scan(&generateString)
+		SqlQuery := `INSERT INTO artist(name, formation_date, image, first_album, members, external_id)VALUES($1,$2,$3,$4,$5,$6) RETURNING artist_id `
+		err := tx.QueryRowContext(ctx, SqlQuery, val.Name, formationDate, val.Image, val.FirstAlbum, val.Members, val.ExternalId).Scan(&generateString)
 		if err != nil {
 			return err
 		}
