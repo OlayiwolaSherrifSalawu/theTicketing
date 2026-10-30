@@ -22,17 +22,18 @@ func TestSaveData(t *testing.T) {
 		fmt.Fprintf(os.Stderr, "%s", err)
 		return
 	}
-	data := *model.Data{
+	data := model.Data{
 		Artists: []model.Artists{
-			model.Artists{
-				ArtistId: 9,
-				Name:"Dusin Oyekan",
-				Image: "https://spiritchant.com.ng/artist/dunsin-oyekan/",
+			{
+				ArtistId:     "8",
+				Name:         "Dusin Oyekan",
+				Image:        "https://spiritchant.com.ng/artist/dunsin-oyekan/",
 				CreationDate: "2020-4-12",
-				Members:[]string{"Theophilus Sunday", "Poju Oyemade"},
-				ExternalId: 999,
-				FirstAlbum: "Code red",
-			}
+				Members:      []string{"Theophilus Sunday", "Poju Oyemade"},
+				ExternalId:   999,
+				FirstAlbum:   "Code red",
+			},
 		},
 	}
+	fmt.Print(data)
 }
