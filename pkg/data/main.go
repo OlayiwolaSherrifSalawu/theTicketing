@@ -3,7 +3,6 @@ package data
 import (
 	"context"
 	"database/sql"
-	"strconv"
 	"strings"
 	"time"
 
@@ -23,7 +22,7 @@ func SaveData(ctx context.Context, db *sql.DB, data *model.Data) error {
 
 	for _, val := range data.Artists {
 		var generateString string
-		formationDate := strconv.Itoa(val.CreationDate)
+		formationDate := (val.CreationDate)
 		SqlQuery := `INSERT INTO artist(name, formation_date, image, first_album, members, external_id)VALUES($1,$2,$3,$4,$5,$6) RETURNING artist_id `
 		err := tx.QueryRowContext(ctx, SqlQuery, val.Name, formationDate, val.Image, val.FirstAlbum, val.Members, val.ExternalId).Scan(&generateString)
 		if err != nil {
@@ -47,7 +46,6 @@ func SaveData(ctx context.Context, db *sql.DB, data *model.Data) error {
 			}
 		}
 	}
-	
 
 	return tx.Commit()
 }

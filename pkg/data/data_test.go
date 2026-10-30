@@ -6,6 +6,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/OlayiwolaSherrifSalawu/theTicketing.git/pkg/model"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -20,5 +21,18 @@ func TestSaveData(t *testing.T) {
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "%s", err)
 		return
+	}
+	data := *model.Data{
+		Artists: []model.Artists{
+			model.Artists{
+				ArtistId: 9,
+				Name:"Dusin Oyekan",
+				Image: "https://spiritchant.com.ng/artist/dunsin-oyekan/",
+				CreationDate: "2020-4-12",
+				Members:[]string{"Theophilus Sunday", "Poju Oyemade"},
+				ExternalId: 999,
+				FirstAlbum: "Code red",
+			}
+		},
 	}
 }
