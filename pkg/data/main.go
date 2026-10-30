@@ -39,12 +39,15 @@ func SaveData(ctx context.Context, db *sql.DB, data *model.Data) error {
 				if err != nil {
 					return err
 				}
-				queryStr := `INSERT INTO events(artistId, location, date, availableTickets, tickeTypes, eventName, totalCapacity)VALUES($1, $2, $3, $4, $5, $6, $7)`
-				tx.QueryRowContext(ctx, queryStr, generateString, key, date, 50, "FREE", val.Name, 1000)
+				queryStr := `INSERT INTO events(artist_id, location, start_time, available_tickets, tickets_types, event_name, total_capacity)VALUES($1, $2, $3, $4, $5, $6, $7)`
+				_, err = tx.ExecContext(ctx, queryStr, generateString, key, date, 50, "FREE", val.Name, 1000)
+				if err != nil {
+					return err
+				}
 			}
 		}
 	}
-	tx.Commit()
+	
 
-	return nil
+	return tx.Commit()
 }
