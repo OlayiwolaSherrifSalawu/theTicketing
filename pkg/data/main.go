@@ -34,8 +34,12 @@ func SaveData(ctx context.Context, db *sql.DB, data *model.Data) error {
 			key = strings.ToTitle(key)
 			for _, dates := range vals {
 				var date time.Time
-				dates = time.Time.Local(date).Format(dates)
-				queryStr := ` INSERT INTO events(artistId, location, date, availableTickets, tickeTypes, eventName, totalCapacity)VALUES($1, $2, $3, $4, $5, $6, $7)`
+				dates = strings.TrimPrefix(dates, "*")
+				date, err = time.Parse("02-01-2006", dates)
+				if err != nil {
+					return err
+				}
+				queryStr := `INSERT INTO events(artistId, location, date, availableTickets, tickeTypes, eventName, totalCapacity)VALUES($1, $2, $3, $4, $5, $6, $7)`
 				tx.QueryRowContext(ctx, queryStr, generateString, key, date, 50, "FREE", val.Name, 1000)
 			}
 		}
