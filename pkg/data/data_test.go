@@ -6,6 +6,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/OlayiwolaSherrifSalawu/theTicketing.git/api"
 	"github.com/OlayiwolaSherrifSalawu/theTicketing.git/pkg/model"
 	"github.com/jackc/pgx/v5"
 )
@@ -35,5 +36,6 @@ func TestSaveData(t *testing.T) {
 			},
 		},
 	}
-	fmt.Print(data)
+	api.OpenDb()
+	SaveData(context.Background())
 }
