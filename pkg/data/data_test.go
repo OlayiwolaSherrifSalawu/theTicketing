@@ -8,21 +8,16 @@ import (
 
 	"github.com/OlayiwolaSherrifSalawu/theTicketing.git/api"
 	"github.com/OlayiwolaSherrifSalawu/theTicketing.git/pkg/model"
-	"github.com/jackc/pgx/v5"
 )
 
 func TestSaveData(t *testing.T) {
 
-	conn, err := pgx.Connect(context.Background(), os.Getenv("DATABASE_URL"))
+	conn, err := api.CreateConnection("config.env")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "%s", err)
 		return
 	}
-	err = conn.Ping(t.Context())
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "%s", err)
-		return
-	}
+
 	data := model.Data{
 		Artists: []model.Artists{
 			{
@@ -36,6 +31,13 @@ func TestSaveData(t *testing.T) {
 			},
 		},
 	}
-	api.OpenDb()
-	SaveData(context.Background())
+	db, err := api.OpenDb(conn)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "%s", err)
+		return
+	}
+	err = SaveData(context.Background(), db, &data)
+	if err!=nil{
+		t.Fatalf("this test failed because %s", err)
+	}
 }
