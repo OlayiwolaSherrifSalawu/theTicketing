@@ -6,6 +6,16 @@ services:
       - "8080:4000"
     volumes:
       - "./:/app"
+    environment:
+      Host: postgres-db
+      Port: "5432"
+      User: ola
+      Password: jesuYiwola
+      Database: theticketing
+      SSLMode: disable
+      # Export JWT (>= 32 bytes) before `docker compose up`; the app
+      # refuses to start without it.
+      JWT: ${JWT:-}
     depends_on:
       postgres-db:
         condition: service_healthy
