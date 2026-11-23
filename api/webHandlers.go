@@ -6,6 +6,8 @@ import (
 	"io"
 	"net/http"
 	"time"
+
+	"github.com/OlayiwolaSherrifSalawu/theTicketing.git/pkg/model/theticket"
 )
 
 // HomePageHandler and EventsPartialHandler deliberately don't use the
@@ -18,7 +20,11 @@ import (
 
 // HomePageHandler renders the full browse-events page.
 func (a *Application) HomePageHandler(w http.ResponseWriter, r *http.Request) {
-	events, err := a.TheTicket.GetAllEvents(r.Context(), eventFilters(r))
+	filter, verr := eventFilters(r)
+	if verr != nil {
+		filter = theticket.EventFilter{Name: filter.Name, Location: filter.Location, Category: filter.Category}
+	}
+	events, err := a.TheTicket.GetAllEvents(r.Context(), filter)
 	if err != nil {
 		a.serverError(w, err)
 		return
@@ -38,7 +44,11 @@ func (a *Application) HomePageHandler(w http.ResponseWriter, r *http.Request) {
 // EventsPartialHandler is the htmx target for the search bar — same query,
 // same view-model, just the grid partial instead of the full page.
 func (a *Application) EventsPartialHandler(w http.ResponseWriter, r *http.Request) {
-	events, err := a.TheTicket.GetAllEvents(r.Context(), eventFilters(r))
+	filter, verr := eventFilters(r)
+	if verr != nil {
+		filter = theticket.EventFilter{Name: filter.Name, Location: filter.Location, Category: filter.Category}
+	}
+	events, err := a.TheTicket.GetAllEvents(r.Context(), filter)
 	if err != nil {
 		a.serverError(w, err)
 		return
@@ -48,17 +58,6 @@ func (a *Application) EventsPartialHandler(w http.ResponseWriter, r *http.Reques
 	if err := a.Templates.RenderPartial(w, http.StatusOK, "home.tmpl", "event_grid", data); err != nil {
 		a.serverError(w, err)
 	}
-}
-
-func eventFilters(r *http.Request) map[string]string {
-	filters := map[string]string{}
-	if v := r.URL.Query().Get("eventName"); v != "" {
-		filters["eventName"] = v
-	}
-	if v := r.URL.Query().Get("location"); v != "" {
-		filters["location"] = v
-	}
-	return filters
 }
 
 // responseRecorder is a minimal http.ResponseWriter that buffers what's

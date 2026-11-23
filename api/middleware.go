@@ -2,8 +2,8 @@ package api
 
 import (
 	"context"
+	"fmt"
 	"net/http"
-	"os"
 	"strings"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -23,16 +23,23 @@ func (a *Application) XssProtection(next http.Handler) http.Handler {
 		func(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("X-XSS-Protection", "1; mode=block")
 			w.Header().Set("X-Frame-Options", "deny")
+			w.Header().Set("X-Content-Type-Options", "nosniff")
 			next.ServeHTTP(w, r)
 		})
 }
 
+// RecoverPanic turns a panic in any handler into a logged 500 instead of
+// a dropped connection.
 func (a *Application) RecoverPanic(next http.Handler) http.Handler {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
 			defer func() {
 				if err := recover(); err != nil {
-					w.Header().Set("Connection", "closed")
+					if err == http.ErrAbortHandler {
+						panic(err)
+					}
+					w.Header().Set("Connection", "close")
+					a.serverError(w, fmt.Errorf("panic: %v", err))
 				}
 			}()
 			next.ServeHTTP(w, r)
@@ -42,38 +49,44 @@ func (a *Application) RecoverPanic(next http.Handler) http.Handler {
 func (a *Application) RequireAuthentication(next http.Handler) http.Handler {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			auth := a.getToken(r)
-			if auth == "" {
-				a.ErroMessage.Println("afang") //my get token is empty
-				a.clientError(w, http.StatusUnauthorized)
+			userID, ok := a.authenticate(r)
+			if !ok {
+				a.unauthorized(w, r)
 				return
 			}
-			theAuth := strings.TrimPrefix(auth, "Bearer ")
-			tokens, err := jwt.Parse(theAuth, func(t *jwt.Token) (any, error) {
-				if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
-					return nil, UNEXPECTED_SIGNING_METHOD
-				}
-				return []byte(os.Getenv("JWT")), nil
-			})
-			if err != nil || !tokens.Valid {
-				a.clientError(w, http.StatusUnauthorized)
-				return
-			}
-			userid, err := extractUserFromtoken(tokens)
-			if err != nil {
-				a.serverError(w, err)
-			}
-			ctx := getContext(r.Context(), userid)
-			if ctx == nil {
-				a.serverError(w, CANT_SEND_NIL_CTX)
-				return
-			}
-			newReq := r.WithContext(ctx)
-			next.ServeHTTP(w, newReq)
+			next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), ct, userID)))
 		})
 }
 
-func getContext(ctx context.Context, userid string) context.Context {
-	newCtx := context.WithValue(ctx, ct, userid)
-	return newCtx
+// authenticate validates the request's JWT and returns the user ID in it.
+func (a *Application) authenticate(r *http.Request) (string, bool) {
+	raw := a.getToken(r)
+	if raw == "" {
+		return "", false
+	}
+	token, err := jwt.Parse(raw, func(t *jwt.Token) (any, error) {
+		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, UNEXPECTED_SIGNING_METHOD
+		}
+		return a.JWTSecret, nil
+	}, jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Alg()}), jwt.WithExpirationRequired())
+	if err != nil || !token.Valid {
+		return "", false
+	}
+	userID, err := extractUserFromtoken(token)
+	if err != nil {
+		return "", false
+	}
+	return userID, true
+}
+
+// unauthorized sends browsers navigating to a page to the login screen,
+// and gives everything else (API clients, htmx requests) a JSON 401.
+func (a *Application) unauthorized(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet && r.Header.Get("HX-Request") == "" &&
+		strings.Contains(r.Header.Get("Accept"), "text/html") {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+	a.clientErrorJSON(w, http.StatusUnauthorized, "", "Authentication required.")
 }

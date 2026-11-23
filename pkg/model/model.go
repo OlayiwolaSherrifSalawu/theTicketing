@@ -23,7 +23,33 @@ type Event struct {
 	TicketsTypes     string    `json:"ticketsTypes"`
 	EventName        string    `json:"eventName"`
 	TotalCapacity    int       `json:"totalCapacity"`
+	OrganizerId      *string   `json:"organizerId,omitempty"`
+	Description      string    `json:"description"`
+	Category         string    `json:"category"`
+	PriceCents       int       `json:"priceCents"`
+	ImageURL         string    `json:"imageUrl"`
 }
+
+// Ticket is one booking: a user holding Quantity seats for an event.
+// EventName, StartTime and Location are denormalised from events when
+// listing a user's tickets, so the client needs no second request.
+type Ticket struct {
+	Id         string    `json:"id"`
+	EventId    string    `json:"eventId"`
+	UserId     string    `json:"userId"`
+	Quantity   int       `json:"quantity"`
+	TotalCents int       `json:"totalCents"`
+	Status     string    `json:"status"`
+	CreatedAt  time.Time `json:"createdAt"`
+	EventName  string    `json:"eventName,omitempty"`
+	StartTime  time.Time `json:"eventDate,omitempty"`
+	Location   string    `json:"location,omitempty"`
+}
+
+const (
+	TicketConfirmed = "confirmed"
+	TicketCancelled = "cancelled"
+)
 
 type Artists struct {
 	ArtistId     string   `json:"-"`

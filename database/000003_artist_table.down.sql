@@ -1,0 +1,2 @@
+ALTER TABLE events DROP COLUMN IF EXISTS artist_id;
+DROP TABLE IF EXISTS artist;

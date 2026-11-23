@@ -6,26 +6,25 @@ import (
 )
 
 func Run() {
-	conn, errr := CreateConnection("config.env")
-	if errr != nil {
-		return
-	}
-	newLog := log.New(os.Stderr, "error-message", log.Ltime)
-	sqlVAL, errr := OpenDb(conn)
-	if errr != nil {
-		newLog.Println(errr)
-		return
-	}
-	app, err := NewApplication(sqlVAL)
-	if err != nil {
-		newLog.Println(err)
-	}
-	errors := app.RunDBMigration(sqlVAL)
-	if errors != nil {
-		newLog.Println(errors)
-		return
-	}
-	apps := NewAppInterface(app)
+	errLog := log.New(os.Stderr, "ERROR: \t", log.Ldate|log.Ltime)
 
-	apps.Run()
+	conn, err := CreateConnection("config.env")
+	if err != nil {
+		errLog.Fatal(err)
+	}
+	db, err := OpenDb(conn)
+	if err != nil {
+		errLog.Fatal(err)
+	}
+	defer db.Close()
+
+	if err := RunDBMigration(db); err != nil {
+		errLog.Fatal(err)
+	}
+	app, err := NewApplication(db, os.Getenv("JWT"))
+	if err != nil {
+		errLog.Fatal(err)
+	}
+
+	NewAppInterface(app).Run()
 }

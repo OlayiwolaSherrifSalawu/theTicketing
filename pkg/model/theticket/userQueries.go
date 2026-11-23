@@ -13,25 +13,22 @@ type TheTicketModel struct {
 
 func (d *TheTicketModel) Insert(ctx context.Context, User *model.User) error {
 	stmt := "INSERT INTO users(id, username, email_address, created_at, password) VALUES ($1, $2, $3, $4, $5)"
-	tx, err := d.DB.BeginTx(ctx, nil)
-
-	if err != nil {
-		return err
-	}
-	defer tx.Rollback()
-	_, err = tx.ExecContext(ctx, stmt, User.ID, User.UserName, User.EmailAddress, User.TimeStamp, User.HashPassword)
-	if err != nil {
-		return err
-	}
-	tx.Commit()
-	return nil
+	_, err := d.DB.ExecContext(ctx, stmt, User.ID, User.UserName, User.EmailAddress, User.TimeStamp, User.HashPassword)
+	return translate(err)
 }
 
 func (d *TheTicketModel) GetByEmail(ctx context.Context, Email string, User *model.User) error {
-	query := "select id, username, email_address, created_at, password from users where email_address = $1"
+	query := "SELECT id, username, email_address, created_at, password FROM users WHERE lower(email_address) = lower($1)"
 	err := d.DB.QueryRowContext(ctx, query, Email).Scan(&User.ID, &User.UserName, &User.EmailAddress, &User.TimeStamp, &User.HashPassword)
+	return translate(err)
+}
+
+func (d *TheTicketModel) GetByID(ctx context.Context, id string) (*model.User, error) {
+	query := "SELECT id, username, email_address, created_at, password FROM users WHERE id = $1"
+	u := &model.User{}
+	err := d.DB.QueryRowContext(ctx, query, id).Scan(&u.ID, &u.UserName, &u.EmailAddress, &u.TimeStamp, &u.HashPassword)
 	if err != nil {
-		return err
+		return nil, translate(err)
 	}
-	return nil
+	return u, nil
 }

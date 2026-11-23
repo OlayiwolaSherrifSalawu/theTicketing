@@ -2,14 +2,17 @@ package api
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
-	"io"
 	"net/http"
 	"sync"
 	"time"
 
 	"github.com/OlayiwolaSherrifSalawu/theTicketing.git/pkg/model"
 )
+
+// GroupieAPI is the public artist dataset used to seed the database.
+const GroupieAPI = "https://groupietrackers.herokuapp.com/api"
 
 type wrapperLocation struct {
 	Index []model.Location `json:"index"`
@@ -21,121 +24,72 @@ type wrapperRelation struct {
 	Index []model.Relation `json:"index"`
 }
 
+// fetcherEndpoints are the keys the index document must list.
+var fetcherEndpoints = []string{"artists", "locations", "dates", "relation"}
+
+// Fetcher downloads the groupie dataset. api is the index URL, which
+// returns {"artists": url, "locations": url, "dates": url, "relation": url};
+// the four endpoints are fetched concurrently and every one must succeed.
 func Fetcher(api string) (*model.Data, error) {
+	client := &http.Client{Timeout: 10 * time.Second}
 
-	responseMap := map[string]string{}
-	client := &http.Client{
-		Timeout: time.Second * 3,
+	index := map[string]string{}
+	if err := getJSON(client, api, &index); err != nil {
+		return nil, fmt.Errorf("fetching index: %w", err)
 	}
-	resp, err := client.Get(api)
-
-	if err != nil {
-		return &model.Data{}, err
+	for _, key := range fetcherEndpoints {
+		if index[key] == "" {
+			return nil, fmt.Errorf("index is missing the %q endpoint", key)
+		}
 	}
-	defer resp.Body.Close()
 
+	var (
+		artists   []model.Artists
+		locations wrapperLocation
+		dates     wrapperDates
+		relations wrapperRelation
+	)
+	targets := map[string]any{
+		"artists":   &artists,
+		"locations": &locations,
+		"dates":     &dates,
+		"relation":  &relations,
+	}
+
+	// Each goroutine decodes into its own target and reports into its own
+	// slot of errs, so nothing is shared and nothing can block.
 	var wg sync.WaitGroup
-
-	if resp.StatusCode != http.StatusOK {
-		return &model.Data{}, fmt.Errorf("Bad status code not ok.")
-	}
-	decoded := json.NewDecoder(resp.Body)
-	if err := decoded.Decode(&responseMap); err != nil {
-		return &model.Data{}, err
-	}
-
-	// making five buffered ch only job annel
-	chanArtist := make(chan []model.Artists, 1)
-	chanRelations := make(chan []model.Relation, 1)
-	chanDate := make(chan []model.Date, 1)
-	chanLocation := make(chan []model.Location, 1)
-	chanError := make(chan error, 4)
-	artistSlice := []model.Artists{}
-	locationStruct := &wrapperLocation{}
-	dateStruct := &wrapperDates{}
-	relationStruct := &wrapperRelation{}
-	done := make(chan bool)
-	for val := range responseMap {
-		url := responseMap[val]
+	errs := make([]error, len(fetcherEndpoints))
+	for i, key := range fetcherEndpoints {
 		wg.Add(1)
-		go func(endPointKey, endPointUrl string) {
+		go func() {
 			defer wg.Done()
-
-			clients := http.Client{
-				Timeout: 3 * time.Second,
+			if err := getJSON(client, index[key], targets[key]); err != nil {
+				errs[i] = fmt.Errorf("fetching %s: %w", key, err)
 			}
-			resps, err := clients.Get(endPointUrl)
-			if err != nil {
-				go errchan(err, chanError)
-				return
-			}
-			defer resps.Body.Close()
-			if resps.StatusCode != http.StatusOK {
-				go errchan(fmt.Errorf("Bad status code"), chanError)
-				return
-
-			}
-			respsBody, err := io.ReadAll(resps.Body)
-			if err != nil {
-				errchan(err, chanError)
-				return
-			}
-			switch endPointKey {
-			case "artists":
-				errs := json.Unmarshal(respsBody, &artistSlice)
-				if errs != nil {
-					errchan(errs, chanError)
-					return
-				}
-				chanArtist <- artistSlice
-
-			case "locations":
-				errs := json.Unmarshal(respsBody, &locationStruct)
-
-				if errs != nil {
-					errchan(errs, chanError)
-					return
-				}
-				chanLocation <- locationStruct.Index
-
-			case "dates":
-				errs := json.Unmarshal(respsBody, &dateStruct)
-				if errs != nil {
-					errchan(errs, chanError)
-					return
-				}
-				chanDate <- dateStruct.Index
-
-			case "relation":
-				errs := json.Unmarshal(respsBody, &relationStruct)
-				if errs != nil {
-					errchan(errs, chanError)
-					return
-				}
-				chanRelations <- relationStruct.Index
-			}
-
-		}(val, url)
+		}()
 	}
-	go func() {
-		wg.Wait()
-		done <- true
-	}()
-
-	select {
-	case err := <-chanError:
-		return &model.Data{}, err
-	case <-done:
-
+	wg.Wait()
+	if err := errors.Join(errs...); err != nil {
+		return nil, err
 	}
+
 	return &model.Data{
-		Artists:   <-chanArtist,
-		Locations: <-chanLocation,
-		Dates:     <-chanDate,
-		Relations: <-chanRelations,
+		Artists:   artists,
+		Locations: locations.Index,
+		Dates:     dates.Index,
+		Relations: relations.Index,
 	}, nil
 }
 
-func errchan(errs error, errchan chan error) {
-	errchan <- errs
+func getJSON(client *http.Client, url string, dst any) error {
+	resp, err := client.Get(url)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("unexpected status %s", resp.Status)
+	}
+	return json.NewDecoder(resp.Body).Decode(dst)
 }
